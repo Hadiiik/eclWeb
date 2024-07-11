@@ -1,30 +1,29 @@
 import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 type body = {
-    parentCategory:string
+    categoryName:string,
+    parentCategoryName:string
 }
 
 export async function POST(req:NextRequest){
     if(!req.cookies.has("sToken"))
         return NextResponse.json({
-            message: "not allowed"
+            message: "method not allowed"
           }, {
             status: 405,
           })
     if(req.cookies.get("sToken")?.value!=process.env.S_TOKEN)
         return NextResponse.json({
-            message: "not allowed"
+            message: "method not allowed"
           }, {
             status: 405,
           })
     const req_body:body = await req.json();
-    const {data,error} = await supabase.from("categories")
-    .select("category_name")
-    .eq("parent_category_name",req_body.parentCategory)
-    if(error)
-      return Response.json({error})
+    const {data,error} = await supabase.from("categories").insert(req_body)
     if(data)
-      return Response.json({ data })
+        return new Response("posted ")
+    if(error)
+        return new Response("something went wrong")
     
 
     
