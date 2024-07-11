@@ -15,7 +15,9 @@ const SignUp = () => {
         e.preventDefault();
         console.log(singUpdata)
         // set cookies 
+        const user_data = JSON.stringify(singUpdata);
         Cookies.set('sToken', getHash(singUpdata.userName+""+singUpdata.password), { expires: 7 })
+        Cookies.set('user-data', user_data, { expires: 7 })
         router.push("/")
         
     }
