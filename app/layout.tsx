@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar">
+    <html lang="ar" className=" scroll-smooth focus:scroll-auto">
       <body className={ballo.className}>{children}</body>
     </html>
   );
