@@ -1,11 +1,20 @@
-"use client"
-import Cookies from "js-cookie"
-function Home() {
+import ContactSection from "./landingPageComponents/ContactSection";
+import Footer from "./landingPageComponents/Footer";
+import Header from "./landingPageComponents/Header";
+import HeroSection from "./landingPageComponents/HeroSection";
+import ServicesSection from "./landingPageComponents/ServicesSection";
+
+
+const Home = () => {
   return (
-    <div>
-      {Cookies.get("sToken")}
-      <h1>hello world</h1>
-    </div>
-  )
+    <>
+      <Header />
+      <HeroSection />
+      <ServicesSection />
+      <ContactSection />
+      <Footer />
+    </>
+  );
 }
-export default Home
+
+export default Home;
