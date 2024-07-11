@@ -1,5 +1,4 @@
 import ContactSection from "./landingPageComponents/ContactSection";
-import Footer from "./landingPageComponents/Footer";
 import Header from "./landingPageComponents/Header";
 import HeroSection from "./landingPageComponents/HeroSection";
 import ServicesSection from "./landingPageComponents/ServicesSection";
@@ -12,7 +11,7 @@ const Home = () => {
       <HeroSection />
       <ServicesSection />
       <ContactSection />
-      <Footer />
+      
     </>
   );
 }
