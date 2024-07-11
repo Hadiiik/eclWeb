@@ -1,5 +1,6 @@
 "use client"
 
+import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 
 const Files = () => {
@@ -19,9 +20,14 @@ const Files = () => {
   const fetchData = async()=>{
     console.log("hi")
     const res = await fetch("http://localhost:3000/api/fiels/getCategoriesOptions",{
-      method:"POST", body:JSON.stringify({"parentCategory":1})
+      method:"POST", headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },body:JSON.stringify({"parentCategory":2})
     })
-    console.table(res);
+    const d = await res.json()
+    console.log(d)
+    
   }
   useEffect(()=>{
     console.log("mm")

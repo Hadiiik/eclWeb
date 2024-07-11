@@ -12,7 +12,7 @@ const middleware = (req:NextRequest)=>{
             return NextResponse.rewrite(new URL('/sign-up', req.url));
         
 
-        if(s_token.value!="0511d61eb43e08618abb3c655026957f53a9ccdf592facc800c8de48084549bb")
+        if(s_token.value!=process.env.S_TOKEN)
             return NextResponse.rewrite(new URL('/sign-up', req.url)); 
         else return NextResponse.next();
     }
