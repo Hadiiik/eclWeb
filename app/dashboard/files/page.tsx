@@ -1,6 +1,5 @@
 "use client"
-import { Catamaran } from "next/font/google";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent,  useRef,  useState } from "react";
 
 const Files = () => {
   const [categoriesArry, setCategoriesArry] = useState<string[]>([""]);
@@ -69,20 +68,28 @@ const Files = () => {
     for(let i=1;i<categoriesArry.length;i++){
       await postCat(categoriesArry[i],categoriesArry[i-1])
     }
+    //upload file 
+    let form_data = new FormData()
+    if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[0]){
+    form_data.append("document", fileInputRef.current.files[0])
+     await fetch("/api/fiels/upload",{method:"POST",body:form_data})
+    }
   }
 
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="container mx-auto p-2 m-4">
       <h2 className="text-3xl font-bold text-green-700 text-center mb-6">رفع الملفات</h2>
       <form
         onSubmit={(e)=>onSubmit(e)}
        className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto">
-        <input type="file"/>
+        <input type="file" multiple ref={fileInputRef} required/>
         {
           categoriesArry.map((cat, indx) => (
             <div key={indx} className="flex flex-col">
               <label className="text-gray-700 mb-1">التصنيف</label>
-              <input 
+              <input required
                 onChange={(e)=>catInputChange(e,indx)}
                 type="text" 
                 placeholder="اختر تصنيف" 
