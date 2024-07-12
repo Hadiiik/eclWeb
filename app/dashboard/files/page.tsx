@@ -68,12 +68,24 @@ const Files = () => {
     for(let i=1;i<categoriesArry.length;i++){
       await postCat(categoriesArry[i],categoriesArry[i-1])
     }
+    //get full_category_path 
+    let full_category_path = "";
+    for(let i=0;i<categoriesArry.length;i++)
+      full_category_path+= " " + categoriesArry[i];
     //upload file 
+    if(!fileInputRef.current || !fileInputRef.current.files)
+    {
+      alert("يرجى اختيار ملف")
+      return;
+    }
+    for(let i=0;i<fileInputRef.current.files.length;i++){
     let form_data = new FormData()
-    if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[0]){
-    form_data.append("document", fileInputRef.current.files[0])
+    if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
+    form_data.append("document", fileInputRef.current.files[i])
+    form_data.append("full_category_path",full_category_path)
      await fetch("/api/fiels/upload",{method:"POST",body:form_data})
     }
+  }
   }
 
 
