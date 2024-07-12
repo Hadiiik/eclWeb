@@ -82,20 +82,16 @@ export async function POST(req: NextRequest) {
             "file_id": fileIdsString, // استخدم السلسلة النصية هنا
             "full_category_path": full_category_path
         });
-
-    if (data) {
-        console.log(data);
-        return NextResponse.json({
-            message: "uploaded successfully"
-        }, {
-            status: 201,
-        });
-    }
-
-    console.log(error);
+    if(error)
     return NextResponse.json({
         message: "not uploaded"
     }, {
         status: 422,
     });
+    return NextResponse.json({
+      message: "uploaded successfully",
+      file_name :file.name
+  }, {
+      status: 201,
+  });
 }

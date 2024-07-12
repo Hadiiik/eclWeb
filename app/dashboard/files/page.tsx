@@ -1,10 +1,14 @@
 "use client"
 import { ChangeEvent, FormEvent,  useRef,  useState } from "react";
-
+type pendingFile = {
+  name : string,
+  isUploaded : boolean
+}
 const Files = () => {
   const [categoriesArry, setCategoriesArry] = useState<string[]>([""]);
   const [optionsMatrix, setOptionsMatrix] = useState<string[][]>([["علمي","ادبي"]]);
-
+  const [uploadCount,setUploadedCount] = useState(0);
+  
   const revalidateOptionsMatrix = async (indx:number)=>{
     for(let i=1;i<indx;i++){
       const option = await getOPtions(categoriesArry[i-1]);
@@ -63,7 +67,6 @@ const Files = () => {
           'Content-Type': 'application/json'
       },body:JSON.stringify({"category_name":category_name,"parent_category_name":parent_category_name})
       })
-      console.log(res)
     }
     for(let i=1;i<categoriesArry.length;i++){
       await postCat(categoriesArry[i],categoriesArry[i-1])
@@ -79,11 +82,12 @@ const Files = () => {
       return;
     }
     for(let i=0;i<fileInputRef.current.files.length;i++){
-    let form_data = new FormData()
+    let form_data = new FormData();
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
     form_data.append("document", fileInputRef.current.files[i])
     form_data.append("full_category_path",full_category_path)
-     await fetch("/api/fiels/upload",{method:"POST",body:form_data})
+     const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
+     setUploadedCount(pre=>pre+1);
     }
   }
   }
@@ -95,11 +99,11 @@ const Files = () => {
       <h2 className="text-3xl font-bold text-green-700 text-center mb-6">رفع الملفات</h2>
       <form
         onSubmit={(e)=>onSubmit(e)}
-       className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto">
+       className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto ">
         <input type="file" multiple ref={fileInputRef} required/>
         {
           categoriesArry.map((cat, indx) => (
-            <div key={indx} className="flex flex-col">
+            <div key={indx} className="flex flex-col ">
               <label className="text-gray-700 mb-1">التصنيف</label>
               <input required
                 onChange={(e)=>catInputChange(e,indx)}
@@ -137,6 +141,9 @@ const Files = () => {
           إزالة تصنيف
         </button>
       </div>
+      {
+        uploadCount>0&&<p className=" flex justify-center text-green-600 mt-5">{`تم رفع ${uploadCount} ملف بنجاح`}</p>
+      }
     </div>
   )
 }
