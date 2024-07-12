@@ -1,13 +1,11 @@
 "use client"
 import { ChangeEvent, FormEvent,  useRef,  useState } from "react";
-type pendingFile = {
-  name : string,
-  isUploaded : boolean
-}
+import DashBoardHeader from "../dashboardCompenetnts/DashBoardHeader";
 const Files = () => {
   const [categoriesArry, setCategoriesArry] = useState<string[]>([""]);
   const [optionsMatrix, setOptionsMatrix] = useState<string[][]>([["علمي","ادبي"]]);
   const [uploadCount,setUploadedCount] = useState(0);
+  const [pendingCount,setPendingCount] = useState(0);
   
   const revalidateOptionsMatrix = async (indx:number)=>{
     for(let i=1;i<indx;i++){
@@ -55,6 +53,8 @@ const Files = () => {
     let categoriesArry_copy = [...categoriesArry];
     categoriesArry_copy[indx] = e.target.value;
     setCategoriesArry(categoriesArry_copy);
+    revalidateOptionsMatrix(indx);
+    
   }
   
   const onSubmit = async (e:FormEvent<HTMLFormElement>) =>{
@@ -75,12 +75,15 @@ const Files = () => {
     let full_category_path = "";
     for(let i=0;i<categoriesArry.length;i++)
       full_category_path+= " " + categoriesArry[i];
+    setCategoriesArry([""]);
+    
     //upload file 
     if(!fileInputRef.current || !fileInputRef.current.files)
     {
       alert("يرجى اختيار ملف")
       return;
     }
+    setPendingCount(fileInputRef.current.files.length);
     for(let i=0;i<fileInputRef.current.files.length;i++){
     let form_data = new FormData();
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
@@ -88,13 +91,19 @@ const Files = () => {
     form_data.append("full_category_path",full_category_path)
      const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
      setUploadedCount(pre=>pre+1);
+     setPendingCount(pre=>pre-1);
     }
   }
+    //
+    
+
   }
 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   return (
+    <>
+    <DashBoardHeader/>
     <div className="container mx-auto p-2 m-4">
       <h2 className="text-3xl font-bold text-green-700 text-center mb-6">رفع الملفات</h2>
       <form
@@ -143,8 +152,13 @@ const Files = () => {
       </div>
       {
         uploadCount>0&&<p className=" flex justify-center text-green-600 mt-5">{`تم رفع ${uploadCount} ملف بنجاح`}</p>
+        
+      }
+      {
+        pendingCount>0&&<p className=" flex justify-center text-red-600 mt-5">{`جاري رفع ${pendingCount} ملف `}</p>
       }
     </div>
+    </>
   )
 }
 
