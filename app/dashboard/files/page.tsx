@@ -7,16 +7,33 @@ const Files = () => {
   const [uploadCount,setUploadedCount] = useState(0);
   const [pendingCount,setPendingCount] = useState(0);
   
-  const revalidateOptionsMatrix = async (indx:number)=>{
-    for(let i=1;i<indx;i++){
-      const option = await getOPtions(categoriesArry[i-1]);
+  const revalidateOptionsMatrix = async (startIndex: number) => {
+    for (let i = startIndex + 1; i < categoriesArry.length; i++) {
+      const option = await getOPtions(categoriesArry[i - 1]);
       let optionsMatrix_copy = [...optionsMatrix];
-        
-      console.log(option)
-      optionsMatrix_copy[i] = option;
+      if (JSON.stringify(optionsMatrix_copy[i]) !== JSON.stringify(option)) {
+        optionsMatrix_copy[i] = option;
+        setOptionsMatrix(optionsMatrix_copy);
+      }
+    }
+  };
+  
+  const catInputChange = async (e: ChangeEvent<HTMLInputElement>, indx: number) => {
+    let categoriesArry_copy = [...categoriesArry];
+    categoriesArry_copy[indx] = e.target.value;
+    setCategoriesArry(categoriesArry_copy);
+  
+    // Update options for the current input
+    const updatedOptions = await getOPtions(e.target.value);
+    let optionsMatrix_copy = [...optionsMatrix];
+    if (JSON.stringify(optionsMatrix_copy[indx + 1]) !== JSON.stringify(updatedOptions)) {
+      optionsMatrix_copy[indx + 1] = updatedOptions;
       setOptionsMatrix(optionsMatrix_copy);
     }
-  }
+  
+    // Revalidate options for the following inputs
+    revalidateOptionsMatrix(indx);
+  };
 
   const  addCat = async () => {
     setCategoriesArry([...categoriesArry, ""]);
@@ -49,13 +66,7 @@ const Files = () => {
     return arry_object
     
   }
-  const catInputChange = (e:ChangeEvent<HTMLInputElement>,indx:number)=>{
-    let categoriesArry_copy = [...categoriesArry];
-    categoriesArry_copy[indx] = e.target.value;
-    setCategoriesArry(categoriesArry_copy);
-    revalidateOptionsMatrix(indx);
-    
-  }
+  
   
   const onSubmit = async (e:FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
