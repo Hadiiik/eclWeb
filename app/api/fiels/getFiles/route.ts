@@ -17,7 +17,6 @@ export async function POST(req:NextRequest){
             status: 405,
           })
     const req_body:body = await req.json();
-    console.log(req_body)
     const page = req_body.page;
     const LIMIT = 6;
     const start = (page-1)*LIMIT;
