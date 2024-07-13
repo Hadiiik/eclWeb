@@ -23,11 +23,13 @@ export async function POST(req:NextRequest){
     const {data,error} = await supabase
     .from("messages")
     .insert(req_body)
-    if(data)
+    if(error)
         return NextResponse.json(
-    {message:"message sent sucseffuly"},{status:201}
-    )
+            {message:"message could not be sent "},{status:422}
+            )
+
+            
     return NextResponse.json(
-        {message:"message could not be sent "},{status:422}
+        {message:"message sent sucseffuly"},{status:201}
         )
 }
