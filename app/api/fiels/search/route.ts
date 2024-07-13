@@ -6,22 +6,13 @@ type Body = {
     search_query: string
 }
 
-// Function to generate random unique substrings from the search query
-function generateUniqueSubstrings(query: string, count: number): string[] {
-    const substrings = new Set<string>();
-    const length = query.length;
-
-    // Ensure the length of the substrings is at least 2 characters shorter than the original query
-    const substringLength = Math.max(length - 2, 1);
-
-    while (substrings.size < count) {
-        const start = Math.floor(Math.random() * (length - substringLength));
-        const end = start + substringLength;
-        const substring = query.substring(start, end);
-        substrings.add(substring);
+// Function to generate sliding window substrings from the search query
+function generateSlidingWindowSubstrings(query: string, windowSize: number): string[] {
+    const substrings = [];
+    for (let i = 0; i <= query.length - windowSize; i++) {
+        substrings.push(query.substring(i, i + windowSize));
     }
-
-    return Array.from(substrings);
+    return substrings;
 }
 
 export async function POST(req: NextRequest) {
@@ -37,9 +28,10 @@ export async function POST(req: NextRequest) {
     const end = start + LIMIT - 1;
     const search_query = req_body.search_query;
 
-    // Generate three unique random substrings from the search query
-    const substrings = generateUniqueSubstrings(search_query, 3);
+    // Generate substrings using sliding window of size 3
+    const substrings = generateSlidingWindowSubstrings(search_query, 3);
     console.log(substrings)
+
     // Create the filter conditions for each substring
     const filters = substrings.map(substring => `full_category_path.ilike.%${substring}%`).join(',');
 
@@ -52,6 +44,7 @@ export async function POST(req: NextRequest) {
         .range(start, end);
 
     if (error) {
+        console.error(error);
         return NextResponse.json({ status: 402 });
     }
 

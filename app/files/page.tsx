@@ -4,21 +4,17 @@ import Header from '../landingPageComponents/Header';
 
 interface File {
   id: string;
-  name: string;
-  category: string;
+  file_name: string;
+  full_category_path: string;
 }
 
-const files: File[] = [
-  { id: '1', name: 'ملف 1', category: 'تصنيف 1' },
-  { id: '2', name: 'ملف 2', category: 'تصنيف 2' },
-  { id: '3', name: 'ملف 3', category: 'تصنيف 1' },
-  { id: '4', name: 'ملف 4', category: 'تصنيف 3' },
-  // أضف المزيد من الملفات هنا
-];
+
 
 const SearchPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [currentPage,setCurrentPage] = useState(0);
+  const [filesPages,setFilePages] = useState<File[][]>([[{full_category_path:"",file_name:"",id:""}]]);
+  const [erro,setError] = useState(false);
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
@@ -26,16 +22,21 @@ const SearchPage: React.FC = () => {
   const handleSuggestionClick = (suggestion: string) => {
     setSearchTerm(suggestion);
   };
-  const handelSearch = async ()=>{
+  const onSearch = async ()=>{
     const req = {"page":1,"search_query":searchTerm};
     const req_body =  JSON.stringify(req);
     const res = await fetch("/api/fiels/search",{method:"POST",body:req_body});
     const result = await res.json();
-    console.log(result)
+    if(!result.data){
+      setError(true)
+      return;
+    }
+    setError(false)
+    console.log(result.data)
+    setFilePages([...filesPages,result.data]);
+    setCurrentPage(pre=>pre+1);
 
   }
-
-  const filteredFiles = files.filter(file => file.name.includes(searchTerm));
 
   const uniqueCategories = ["تصنيف 1"];
 
@@ -54,7 +55,7 @@ const SearchPage: React.FC = () => {
           
         />
         <p className=' p-3 mx-2 bg-slate-300 flex self-center rounded-md hover:bg-slate-200 hover:cursor-pointer'
-            onClick={handelSearch}
+            onClick={onSearch}
         >بحث</p>
         </div>
       </div>
@@ -70,10 +71,13 @@ const SearchPage: React.FC = () => {
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredFiles.map((file) => (
+        {
+          (filesPages[currentPage].length==0  || erro) && <p className='flex justify-center text-red-600'>لم يتم العثور على الملفات المطلوبة جرب استخدام كلمات مشابهة</p> 
+        }
+        {filesPages[currentPage].slice(1).map((file) => (
           <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow">
-            <h2 className="text-lg font-bold">{file.name}</h2>
-            <p className="text-sm text-gray-500">{file.category}</p>
+            <h2 className="text-lg font-bold"> {file.file_name}</h2>
+            <p className="text-sm text-blue-400 overflow-hidden text-ellipsis ">{file.full_category_path.trim().split(" ").join("/")}</p>
           </div>
         ))}
       </div>
