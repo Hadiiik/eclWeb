@@ -10,7 +10,7 @@ interface Message {
 
 const MessagesTable = () => {
   const [messagesArryPages, setMessagesArryPages] = useState<Message[][]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(-1);
   const [loading, setLoading] = useState(false); // حالة التحميل
 
   const isInitialMount = useRef(true);
@@ -27,16 +27,15 @@ const MessagesTable = () => {
     if (res.status === 402) return;
 
     const result = await res.json();
-    if(result.data.length==0)
-      return;
+    if (result.data.length === 0) return;
+    
     setMessagesArryPages(prev => [...prev, result.data]);
+    setCurrentPage(prev => prev + 1); // تحديث الصفحة الحالية بعد جلب البيانات الجديدة
   };
 
   useEffect(() => {
     // تحميل البيانات الأولية عند أول تحميل للصفحة
     handelShowMore();
-    handeGoBack();
-    handelGoMore();
   }, []);
 
   const handelGoMore = async () => {
@@ -44,7 +43,6 @@ const MessagesTable = () => {
       setCurrentPage(pre => pre + 1);
     } else {
       await handelShowMore();
-      setCurrentPage(pre => pre + 1);
     }
   };
 

@@ -10,7 +10,7 @@ interface File {
 
 const MessagesTable = () => {
   const [filesArryPages, setFilesArryPages] = useState<File[][]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(-1);
   const [loading, setLoading] = useState(false); // حالة التحميل
 
   const isInitialMount = useRef(true);
@@ -35,6 +35,7 @@ const MessagesTable = () => {
   useEffect(() => {
     // تحميل البيانات الأولية عند أول تحميل للصفحة
     handelShowMore();
+    handelGoMore()
   }, []);
 
   const handelGoMore = async () => {
