@@ -27,6 +27,8 @@ const MessagesTable = () => {
     if (res.status === 402) return;
 
     const result = await res.json();
+    if(result.data.length==0)
+      return;
     setMessagesArryPages(prev => [...prev, result.data]);
   };
 
