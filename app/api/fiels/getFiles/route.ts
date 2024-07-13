@@ -16,7 +16,6 @@ export async function POST(req:NextRequest){
           }, {
             status: 405,
           })
-    console.log("hi")
     const req_body:body = await req.json();
     console.log(req_body)
     const page = req_body.page;
@@ -25,8 +24,8 @@ export async function POST(req:NextRequest){
     const end = start+LIMIT-1
     //get a page  messages from supabase
     const {data,error} = await supabase
-    .from("messages")
-    .select("email,title,id")
+    .from("files")
+    .select("file_name,created_at,id")
     .order("created_at",{ascending:false})
     .range(start,end);
     if(error)
