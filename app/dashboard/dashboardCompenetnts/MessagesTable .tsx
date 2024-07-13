@@ -69,7 +69,7 @@ const MessagesTable = () => {
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{message.email}</td>
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{message.title}</td>
               <td className="px-4 py-2">
-                <Link href={`/messages/${message.id}`} className="text-green-500 hover:text-green-700">
+                <Link href={`/dashboard/messages/${message.id}`} className="text-green-500 hover:text-green-700">
                   عرض الرسالة
                 </Link>
               </td>
