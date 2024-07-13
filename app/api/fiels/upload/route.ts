@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     // تحديد الحد الأقصى لحجم الجزء (5 ميجابايت)
-    const MAX_CHUNK_SIZE =10 * 1024 * 1024; // 10 ميجابايت
+    const MAX_CHUNK_SIZE =5 * 1024 * 1024; // 5 ميجابايت
 
     // تحقق من حجم الملف وتجزئته إذا لزم الأمر
     let fileChunks = [];
