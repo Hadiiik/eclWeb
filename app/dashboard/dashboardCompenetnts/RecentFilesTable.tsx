@@ -27,6 +27,8 @@ const MessagesTable = () => {
     if (res.status === 402) return;
 
     const result = await res.json();
+    if(!result.data)
+      return
     if(result.data.length==0)
       return;
     setFilesArryPages(prev => [...prev, result.data]);
@@ -59,9 +61,12 @@ const MessagesTable = () => {
   };
 
   return (
-    <div className="overflow-x-auto rounded-md" id="messages">
+    <div className="overflow-x-auto rounded-md pt-4" id="messages">
+      <Link href={"/dashboard/files"} className=' flex justify-center bg-green-600 py-4 mb-3 rounded-md mx-20 text-sm text-white hover:bg-green-700'> تحميل ملفات</Link>
+      <hr></hr>
+      <hr></hr>
       <h1 className='flex justify-center font-bold p-4 text-red-600'>
-        الرسائل الجديدة
+        الملفات المضافة مؤخرا 
       </h1>
       <table className="table-auto min-w-full bg-white border border-gray-200 ">
         <thead className='bg-gray-100 '>

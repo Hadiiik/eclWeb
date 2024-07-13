@@ -26,7 +26,8 @@ const Messages = async ({ params }: { params: { id: string } }) => {
   return (
     <div className="container mx-auto p-4 mt-8 max-w-lg bg-white rounded-lg shadow-md text-right">
       <h2 className="text-2xl font-bold text-green-700 mb-4">{message.title}</h2>
-      <p className="text-gray-700 mb-2"><span className="font-semibold text-left">البريد الإلكتروني:</span> {message.email}</p>
+      <p className="text-gray-700 mb-2">{message.email}</p>
+      <hr className='py-2'></hr>
       <p className="text-gray-700 mb-6 whitespace-pre-wrap">{message.content}</p>
       <a 
         href={`mailto:${message.email}`}

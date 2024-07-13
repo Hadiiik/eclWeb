@@ -25,8 +25,10 @@ const MessagesTable = () => {
     setLoading(false); // إيقاف حالة التحميل بعد الاستجابة
 
     if (res.status === 402) return;
-
+    
     const result = await res.json();
+    if(!result.data)
+      return
     if (result.data.length === 0) return;
     
     setMessagesArryPages(prev => [...prev, result.data]);

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
             status: 400,
         });
     }
-
+    console.log("start uploading")
     // تحديد الحد الأقصى لحجم الجزء (5 ميجابايت)
     const MAX_CHUNK_SIZE =5 * 1024 * 1024; // 5 ميجابايت
 
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // مصفوفة لتخزين file_id لكل جزء
     let fileIds = [];
+    console.log(fileChunks)
 
     // تحميل كل جزء إلى Telegram
     for (let chunk of fileChunks) {
