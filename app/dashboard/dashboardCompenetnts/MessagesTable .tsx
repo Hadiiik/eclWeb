@@ -35,6 +35,8 @@ const MessagesTable = () => {
   useEffect(() => {
     // تحميل البيانات الأولية عند أول تحميل للصفحة
     handelShowMore();
+    handeGoBack();
+    handelGoMore();
   }, []);
 
   const handelGoMore = async () => {
@@ -67,7 +69,7 @@ const MessagesTable = () => {
         </thead>
         <tbody className='overflow-x-hidden'>
           {messagesArryPages.length > 0 && messagesArryPages[currentPage]?.map((message, indx) => (
-            <tr key={indx} className="border-b border-gray-200">
+            <tr key={indx} className="border-b border-gray-200 hover:bg-slate-100 transition-all">
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{message.email}</td>
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{message.title}</td>
               <td className="px-4 py-2">

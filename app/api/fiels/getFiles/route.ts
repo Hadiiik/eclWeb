@@ -19,7 +19,7 @@ export async function POST(req:NextRequest){
     const req_body:body = await req.json();
     console.log(req_body)
     const page = req_body.page;
-    const LIMIT = 10;
+    const LIMIT = 6;
     const start = (page-1)*LIMIT;
     const end = start+LIMIT-1
     //get a page  messages from supabase

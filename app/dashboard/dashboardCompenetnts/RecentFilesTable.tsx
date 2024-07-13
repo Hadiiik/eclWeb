@@ -52,14 +52,19 @@ const MessagesTable = () => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = dateString.split('T')[0];
+    return date;
+  };
+
   return (
-    <div className="overflow-x-auto rounded-md" id='messages'>
+    <div className="overflow-x-auto rounded-md" id="messages">
       <h1 className='flex justify-center font-bold p-4 text-red-600'>
         الرسائل الجديدة
       </h1>
-      <table className="table-auto min-w-full bg-white border border-gray-200">
-        <thead className='bg-gray-100'>
-          <tr>
+      <table className="table-auto min-w-full bg-white border border-gray-200 ">
+        <thead className='bg-gray-100 '>
+          <tr className=''>
             <th className="py-2 text-left px-4">اسم الملف</th>
             <th className="py-2 text-left px-4">تاريخ الانشاء</th>
             <th className="py-2 text-left px-4"></th>
@@ -67,9 +72,9 @@ const MessagesTable = () => {
         </thead>
         <tbody className='overflow-x-hidden'>
           {filesArryPages.length > 0 && filesArryPages[currentPage]?.map((file, indx) => (
-            <tr key={indx} className="border-b border-gray-200">
+            <tr key={indx} className="border-b border-gray-200 hover:bg-slate-100 transition-all">
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{file.file_name}</td>
-              <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{file.created_at}</td>
+              <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{formatDate(file.created_at)}</td>
               <td className="px-4 py-2">
                 <Link href={`/dashboard/messages/${file.id}`} className="text-green-500 hover:text-green-700">
                   عرض الملف
