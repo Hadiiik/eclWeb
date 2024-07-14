@@ -14,17 +14,19 @@ const SearchPage: React.FC = () => {
   const [filesPages, setFilePages] = useState<File[][]>([[]]);
   const [erro, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentCatIndx,setCurrentCatIndx] = useState(-1);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
+  const handleSuggestionClick = (suggestion: string,indx :number) => {
+    setCurrentCatIndx(indx);
     setSearchTerm(suggestion);
-    onSearch();
+    onSearch(suggestion);
   };
 
-  const onSearch = async () => {
+  const onSearch = async (search_query:string) => {
     setLoading(true);
     const req = { "page": 1, "search_query": searchTerm.trim() };
     const req_body = JSON.stringify(req);
@@ -47,6 +49,8 @@ const SearchPage: React.FC = () => {
   const uniqueCategories = [
     "علمي",
     "أدبي",
+    "بكالوريا",
+    "تاسع"
   ];
 
   return (
@@ -57,29 +61,30 @@ const SearchPage: React.FC = () => {
           <div className='flex justify-end'>
             <input
               type="search"
-              className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:border-green-500"
+              className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:border-green-500 "
               placeholder="ابحث عن الملفات..."
               value={searchTerm}
               onChange={handleSearch}
             />
             <p className='p-3 mx-2 bg-slate-300 flex self-center rounded-md hover:bg-slate-200 hover:cursor-pointer'
-              onClick={onSearch}
+              onClick={()=>onSearch(searchTerm)}
             >بحث</p>
           </div>
         </div >
-        <div className="grid justify-items-end">
-          <div className=' flex px-2'>
+        <div className="grid justify-items-start">
+          <div className=' flex px-2 bg-slate-50 w-full justify-end mr-4  rounded-md shadow-sm py-2'>
           {uniqueCategories.map((category, index) => (
             <button
               key={index}
-              className="  flex px-3 text-green-500 hover:text-green-600"
-              onClick={() => handleSuggestionClick(category)}
+              className={ (index==currentCatIndx)? " text-green-500 bg-slate-100 p-2 rounded-md shadow-md":""+ "flex  text-red-500 hover:text-green-600 mx-2  bg-slate-100 p-2 rounded-md"}
+              onClick={() => handleSuggestionClick(category,index)}
             >
               {category}
             </button>
             
           ))}
           </div>
+          <br></br>
           {
             loading && <FilesLoadingSkeleton />
           }

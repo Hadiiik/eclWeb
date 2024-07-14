@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const key = `search_${page}_${search_query}`;
     
     if(cache.has(key)){
-        console.log(cache.get(key))
+        await wait(500);
         return NextResponse.json(cache.get(key));
     }
 
@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
     // إنشاء شروط التصفية لكل كلمة مشابهة
     let filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
     //filters = search_query + filters;
-    console.log(similarWords)
     // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
