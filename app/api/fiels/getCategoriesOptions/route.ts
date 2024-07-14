@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { rateLimiterMiddleware } from "@/middleware/rateLimiterMiddleware";
 import { NextRequest, NextResponse } from "next/server";
 type body = {
     parentCategory:string

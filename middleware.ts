@@ -12,7 +12,7 @@ const middleware = (req:NextRequest)=>{
     const cookie = req.cookies.get('user-data')
     if(!cookie)
         return NextResponse.rewrite(new URL('/sign-up', req.url));
-    if(req.nextUrl.pathname=='/dashboard/files'){
+    if(req.nextUrl.pathname.startsWith("/dashboard")){
         
         if(!s_token)
             return NextResponse.rewrite(new URL('/sign-up', req.url));

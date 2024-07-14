@@ -1,12 +1,15 @@
+import { sanitizeInput } from "@/helpers/sanitizeInput";
 import { similarChars } from "@/helpers/similarChars";
 import { supabase } from "@/lib/supabase";
+import { rateLimiterMiddleware } from "@/middleware/rateLimiterMiddleware";
 import { NextRequest, NextResponse } from "next/server";
+import NodeCache from "node-cache";
 
 type Body = {
     page: number,
     search_query: string
 };
-
+const CACHE_DURATION = 10*60 //min 
 // دالة لإنشاء مجموعة فريدة من الكلمات المشابهة لكلمة البحث
 function generateSimilarWords(search_query: string): Set<string> {
     const similarWords = new Set<string>();
@@ -32,26 +35,34 @@ function generateSimilarWords(search_query: string): Set<string> {
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+const cache = new NodeCache({stdTTL:60*60});
 export async function POST(req: NextRequest) {
+    const rateLimitResponse = await rateLimiterMiddleware(req);
+    if (rateLimitResponse) return rateLimitResponse;
     const cookie = req.cookies.get('user-data');
     if (!cookie) {
         return new Response("error");
     }
-
     const req_body: Body = await req.json();
     const page = req_body.page;
     const LIMIT = 6;
     const start = (page - 1) * LIMIT;
     const end = start + LIMIT - 1;
-    const search_query = req_body.search_query;
+    const search_query = sanitizeInput(req_body.search_query);
+    //cache 
+    const key = `search_${page}_${search_query}`;
+    
+    if(cache.has(key)){
+        console.log(cache.get(key))
+        return NextResponse.json(cache.get(key));
+    }
 
     // إنشاء مجموعة فريدة من الكلمات المشابهة
     const similarWords = generateSimilarWords(search_query);
-console.log(similarWords)
     // إنشاء شروط التصفية لكل كلمة مشابهة
-    const filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
-
+    let filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
+    //filters = search_query + filters;
+    console.log(similarWords)
     // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
@@ -59,14 +70,11 @@ console.log(similarWords)
         .or(filters)
         .order("created_at", { ascending: false })
         .range(start, end);
-
+        cache.set(key,{data})
     if (error) {
-        console.error(error);
         return NextResponse.json({ status: 402 });
     }
-
     // الانتظار لمدة 500 مللي ثانية
     await wait(500);
-
     return NextResponse.json({ data });
 }

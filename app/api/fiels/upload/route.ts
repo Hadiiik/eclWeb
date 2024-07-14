@@ -1,7 +1,11 @@
 import { supabase } from "@/lib/supabase";
+import { rateLimiterMiddleware } from "@/middleware/rateLimiterMiddleware";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+    const rateLimitResponse = await rateLimiterMiddleware(req);
+    if (rateLimitResponse) return rateLimitResponse;
+
     if (!req.cookies.has("sToken"))
         return NextResponse.json({
             message: "method not allowed"

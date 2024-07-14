@@ -39,7 +39,7 @@ const SearchPage: React.FC = () => {
       setError(true)
     else setError(false)
     
-    console.log(result.data)
+    console.log(result)
     setFilePages(prev => [...prev, result.data]);
     setCurrentPage(pre => pre + 1);
   }
