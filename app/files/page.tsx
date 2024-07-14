@@ -21,6 +21,7 @@ const SearchPage: React.FC = () => {
 
   const handleSuggestionClick = (suggestion: string) => {
     setSearchTerm(suggestion);
+    onSearch();
   };
 
   const onSearch = async () => {
@@ -43,7 +44,10 @@ const SearchPage: React.FC = () => {
     setCurrentPage(pre => pre + 1);
   }
 
-  const uniqueCategories = ["تصنيف 1"];
+  const uniqueCategories = [
+    "علمي",
+    "أدبي",
+  ];
 
   return (
     <>
@@ -62,17 +66,20 @@ const SearchPage: React.FC = () => {
               onClick={onSearch}
             >بحث</p>
           </div>
-        </div>
-        <div className="flex flex-wrap justify-center space-x-2 space-y-2 mb-4">
+        </div >
+        <div className="grid justify-items-end">
+          <div className=' flex px-2'>
           {uniqueCategories.map((category, index) => (
             <button
               key={index}
-              className="py-2 px-4 rounded-md focus:outline-none bg-gray-200 text-gray-800 hover:bg-gray-300"
+              className="  flex px-3 text-green-500 hover:text-green-600"
               onClick={() => handleSuggestionClick(category)}
             >
               {category}
             </button>
+            
           ))}
+          </div>
           {
             loading && <FilesLoadingSkeleton />
           }

@@ -1,21 +1,34 @@
+import { similarChars } from "@/helpers/similarChars";
 import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 type Body = {
     page: number,
     search_query: string
-}
+};
 
-// Function to generate sliding window substrings from the search query
-function generateSlidingWindowSubstrings(query: string, windowSize: number): string[] {
-    const substrings = [];
-    for (let i = 0; i <= query.length - windowSize; i++) {
-        substrings.push(query.substring(i, i + windowSize));
+// دالة لإنشاء مجموعة فريدة من الكلمات المشابهة لكلمة البحث
+function generateSimilarWords(search_query: string): Set<string> {
+    const similarWords = new Set<string>();
+    
+    // إضافة الكلمة الأصلية
+    similarWords.add(search_query);
+    
+    // إضافة الكلمات المشابهة
+    for (let i = 0; i < search_query.length; i++) {
+        const char = search_query[i];
+        if (similarChars[char]) {
+            for (const similarChar of similarChars[char]) {
+                const similarWord = search_query.substring(0, i) + similarChar + search_query.substring(i + 1);
+                similarWords.add(similarWord);
+            }
+        }
     }
-    return substrings;
+    
+    return similarWords;
 }
 
-// Function to wait for a specified number of milliseconds
+// دالة الانتظار لعدد محدد من المللي ثانية
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -33,14 +46,13 @@ export async function POST(req: NextRequest) {
     const end = start + LIMIT - 1;
     const search_query = req_body.search_query;
 
-    // Generate substrings using sliding window of size 3
-    const substrings = generateSlidingWindowSubstrings(search_query, 3);
-    console.log(substrings);
+    // إنشاء مجموعة فريدة من الكلمات المشابهة
+    const similarWords = generateSimilarWords(search_query);
+console.log(similarWords)
+    // إنشاء شروط التصفية لكل كلمة مشابهة
+    const filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
 
-    // Create the filter conditions for each substring
-    const filters = substrings.map(substring => `full_category_path.ilike.%${substring}%`).join(',');
-
-    // Perform search with the combined filter
+    // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
         .select("file_name, id, full_category_path")
@@ -53,7 +65,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ status: 402 });
     }
 
-    // Wait for 500 ms
+    // الانتظار لمدة 500 مللي ثانية
     await wait(500);
 
     return NextResponse.json({ data });

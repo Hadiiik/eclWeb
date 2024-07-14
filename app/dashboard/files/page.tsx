@@ -104,6 +104,8 @@ const Files = () => {
     let form_data = new FormData();
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
     form_data.append("document", fileInputRef.current.files[i])
+    if(fileInputRef&&fileInputRef.current&&fileInputRef.current.files)
+      full_category_path+= " "+fileInputRef.current.files[i].name.trim()
     form_data.append("full_category_path",full_category_path)
      const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
      setUploadedCount(pre=>pre+1);
