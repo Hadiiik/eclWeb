@@ -6,6 +6,7 @@ const Files = () => {
   const [optionsMatrix, setOptionsMatrix] = useState<string[][]>([["علمي","ادبي"]]);
   const [uploadCount,setUploadedCount] = useState(0);
   const [pendingCount,setPendingCount] = useState(0);
+  const [loading,setLoading] = useState(false);
   
   const revalidateOptionsMatrix = async (startIndex: number) => {
     for (let i = startIndex + 1; i < categoriesArry.length; i++) {
@@ -69,6 +70,7 @@ const Files = () => {
   
   
   const onSubmit = async (e:FormEvent<HTMLFormElement>) =>{
+    setLoading(true)
     e.preventDefault();
     //post categories
     const postCat = async (category_name:string,parent_category_name:string) =>{
@@ -85,16 +87,19 @@ const Files = () => {
     //get full_category_path 
     let full_category_path = "";
     for(let i=0;i<categoriesArry.length;i++)
-      full_category_path+= " " + categoriesArry[i];
+      full_category_path+= " " + categoriesArry[i].trim();
     setCategoriesArry([""]);
     
     //upload file 
     if(!fileInputRef.current || !fileInputRef.current.files)
     {
-      alert("يرجى اختيار ملف")
+      alert("يرجى اختيار ملف");
+      setLoading(false);
       return;
     }
     setPendingCount(fileInputRef.current.files.length);
+    await wait(500)
+    setLoading(false);
     for(let i=0;i<fileInputRef.current.files.length;i++){
     let form_data = new FormData();
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
@@ -109,17 +114,23 @@ const Files = () => {
     
 
   }
-
+  function wait(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   return (
     <>
     <DashBoardHeader/>
-    <div className="container mx-auto p-2 m-4">
-      <h2 className="text-3xl font-bold text-green-700 text-center mb-6">رفع الملفات</h2>
+    <br></br>
+    <h2 className="text-3xl font-bold text-green-700 text-center mb-6">رفع الملفات</h2>
+    {loading&& <UploadFormLoadingSkeleton/>}
+    <div className={"container mx-auto p-2 m-4"}>
       <form
-        onSubmit={(e)=>onSubmit(e)}
-       className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto ">
+        onSubmit={(e)=>{
+          onSubmit(e);
+        }}
+       className={ (loading)?"hidden":""  +" bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto mb-12"}>
         <input type="file" multiple ref={fileInputRef} required/>
         {
           categoriesArry.map((cat, indx) => (
@@ -147,6 +158,8 @@ const Files = () => {
           رفع الملف
         </button>
       </form>
+      
+      {!loading&&
       <div className="flex justify-between mt-4 max-w-md mx-auto space-x-2 w-72 lg:w-full">
         <button 
           onClick={addCat} 
@@ -161,6 +174,7 @@ const Files = () => {
           إزالة تصنيف
         </button>
       </div>
+      }
       {
         uploadCount>0&&<p className=" flex justify-center text-green-600 mt-5">{`تم رفع ${uploadCount} ملف بنجاح`}</p>
         
@@ -174,3 +188,28 @@ const Files = () => {
 }
 
 export default Files;
+
+
+const UploadFormLoadingSkeleton = () => {
+  return (
+    <div className="container mx-auto p-2 m-4">
+      <div className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+        <div className="h-10 bg-gray-200 rounded w-full mb-4"></div>
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="flex flex-col space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="h-10 bg-gray-200 rounded w-full"></div>
+            </div>
+          ))}
+        </div>
+        <div className="h-10 bg-gray-200 rounded w-full mb-4"></div>
+        <div className="flex justify-between space-x-2">
+          <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
+  );
+};

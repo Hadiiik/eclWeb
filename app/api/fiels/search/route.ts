@@ -15,6 +15,11 @@ function generateSlidingWindowSubstrings(query: string, windowSize: number): str
     return substrings;
 }
 
+// Function to wait for a specified number of milliseconds
+function wait(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function POST(req: NextRequest) {
     const cookie = req.cookies.get('user-data');
     if (!cookie) {
@@ -30,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     // Generate substrings using sliding window of size 3
     const substrings = generateSlidingWindowSubstrings(search_query, 3);
-    console.log(substrings)
+    console.log(substrings);
 
     // Create the filter conditions for each substring
     const filters = substrings.map(substring => `full_category_path.ilike.%${substring}%`).join(',');
@@ -47,6 +52,9 @@ export async function POST(req: NextRequest) {
         console.error(error);
         return NextResponse.json({ status: 402 });
     }
+
+    // Wait for 500 ms
+    await wait(500);
 
     return NextResponse.json({ data });
 }
