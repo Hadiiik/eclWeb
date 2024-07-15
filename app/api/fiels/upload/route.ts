@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const config = {
     api: {
-        bodyParser: false, // تأكد من وجود هذا إذا لزم الأمر
-        externalResolver: true,
-        responseLimit: '20mb', // أدخل حجمًا مناسبًا هنا
+      bodyParser: {
+        sizeLimit: '10mb',
+      },
     },
-};
+  }
 
 export async function POST(req: NextRequest) {
     const rateLimitResponse = await rateLimiterMiddleware(req);
