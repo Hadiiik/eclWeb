@@ -107,6 +107,7 @@ const Files = () => {
     if(fileInputRef&&fileInputRef.current&&fileInputRef.current.files)
       full_category_path+= " "+fileInputRef.current.files[i].name.trim()
     form_data.append("full_category_path",full_category_path)
+    //await uploadFileInChunks(fileInputRef.current.files[i],full_category_path);
      const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
      setUploadedCount(pre=>pre+1);
      setPendingCount(pre=>pre-1);
@@ -118,6 +119,43 @@ const Files = () => {
   }
   function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+
+const uploadFileInChunks = async (file: File,full_category_path:string) => {
+  const chunkSize = 4 * 1024 * 1024; // 5MB
+  const totalChunks = Math.ceil(file.size / chunkSize);
+  const fileId = generateUUID(); // توليد معرف فريد للملف
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * chunkSize;
+    const end = Math.min(start + chunkSize, file.size);
+    const chunk = file.slice(start, end);
+
+    const formData = new FormData();
+    formData.append('document', chunk);
+    formData.append('fileId', fileId); // إضافة معرف الملف الفريد
+    formData.append('partNumber', (i + 1).toString());
+    formData.append('totalParts', totalChunks.toString());
+    formData.append("name",file.name)
+    formData.append("full_category_path",full_category_path)
+
+    const res =  await fetch('/api/uploadLargeFile', {
+      method: 'POST',
+      body: formData,
+    });
+    console.log(res)
+  }
+};
+
+// دالة لتوليد معرف UUID
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
   const fileInputRef = useRef<HTMLInputElement>(null);

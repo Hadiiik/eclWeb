@@ -9,25 +9,29 @@ type Body = {
     page: number,
     search_query: string
 };
-const CACHE_DURATION = 10*60 //min 
-// دالة لإنشاء مجموعة فريدة من الكلمات المشابهة لكلمة البحث
+const CACHE_DURATION = 10 * 60; //min 
+
+// دالة لإنشاء مجموعة فريدة من الكلمات المشابهة لكلمات البحث
 function generateSimilarWords(search_query: string): Set<string> {
     const similarWords = new Set<string>();
-    
-    // إضافة الكلمة الأصلية
-    similarWords.add(search_query);
-    
-    // إضافة الكلمات المشابهة
-    for (let i = 0; i < search_query.length; i++) {
-        const char = search_query[i];
-        if (similarChars[char]) {
-            for (const similarChar of similarChars[char]) {
-                const similarWord = search_query.substring(0, i) + similarChar + search_query.substring(i + 1);
-                similarWords.add(similarWord);
+    const words = search_query.split(' '); // تقسيم البحث إلى كلمات فردية
+
+    for (const word of words) {
+        // إضافة الكلمة الأصلية
+        similarWords.add(word);
+
+        // إضافة الكلمات المشابهة
+        for (let i = 0; i < word.length; i++) {
+            const char = word[i];
+            if (similarChars[char]) {
+                for (const similarChar of similarChars[char]) {
+                    const similarWord = word.substring(0, i) + similarChar + word.substring(i + 1);
+                    similarWords.add(similarWord);
+                }
             }
         }
     }
-    
+
     return similarWords;
 }
 
@@ -35,7 +39,8 @@ function generateSimilarWords(search_query: string): Set<string> {
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-const cache = new NodeCache({stdTTL:60*60});
+const cache = new NodeCache({ stdTTL: 60 * 60 });
+
 export async function POST(req: NextRequest) {
     const rateLimitResponse = await rateLimiterMiddleware(req);
     if (rateLimitResponse) return rateLimitResponse;
@@ -51,8 +56,8 @@ export async function POST(req: NextRequest) {
     const search_query = sanitizeInput(req_body.search_query);
     //cache 
     const key = `search_${page}_${search_query}`;
-    
-    if(cache.has(key)){
+
+    if (cache.has(key)) {
         await wait(500);
         return NextResponse.json(cache.get(key));
     }
@@ -61,7 +66,7 @@ export async function POST(req: NextRequest) {
     const similarWords = generateSimilarWords(search_query);
     // إنشاء شروط التصفية لكل كلمة مشابهة
     let filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
-    //filters = search_query + filters;
+    
     // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
@@ -69,7 +74,7 @@ export async function POST(req: NextRequest) {
         .or(filters)
         .order("created_at", { ascending: false })
         .range(start, end);
-        cache.set(key,{data})
+    cache.set(key, { data })
     if (error) {
         return NextResponse.json({ status: 402 });
     }

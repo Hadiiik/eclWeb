@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
                 status: 500,
             });
         }
-
+        console.log("telegram response");
+        console.log(responseBody)
         const file_id = responseBody.result.document.file_id;
         fileIds.push(file_id); // أضف file_id إلى المصفوفة
     }
@@ -94,6 +95,8 @@ export async function POST(req: NextRequest) {
     }, {
         status: 422,
     });
+    console.log("supabase response")
+    console.log(data)
     return NextResponse.json({
       message: "uploaded successfully",
       file_name :file.name
