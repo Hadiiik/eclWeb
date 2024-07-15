@@ -2,11 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { rateLimiterMiddleware } from "@/middleware/rateLimiterMiddleware";
 import { NextRequest, NextResponse } from "next/server";
 
-export const config = {
-    api: {
-      responseLimit: false,
-    },
-  }
+export const responseLimit = "20mb";
 
 export async function POST(req: NextRequest) {
     const rateLimitResponse = await rateLimiterMiddleware(req);
