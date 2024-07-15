@@ -100,3 +100,9 @@ export async function POST(req: NextRequest) {
       status: 201,
   });
 }
+
+export const config = {
+    api: {
+      responseLimit: false,
+    },
+  }
