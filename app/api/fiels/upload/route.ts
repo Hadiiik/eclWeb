@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
   });
 }
 
-export const config = {
+export const routeConfig = {
     api: {
         bodyParser: false, // تأكد من وجود هذا إذا لزم الأمر
         externalResolver: true,
