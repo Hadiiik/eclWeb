@@ -103,6 +103,8 @@ export async function POST(req: NextRequest) {
 
 export const config = {
     api: {
-      responseLimit: false,
-    },
-  }
+        bodyParser: false, // تأكد من وجود هذا إذا لزم الأمر
+        externalResolver: true,
+        responseLimit: '20mb', // أدخل حجمًا مناسبًا هنا
+    },
+};
