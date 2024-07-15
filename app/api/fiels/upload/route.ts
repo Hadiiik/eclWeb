@@ -2,6 +2,14 @@ import { supabase } from "@/lib/supabase";
 import { rateLimiterMiddleware } from "@/middleware/rateLimiterMiddleware";
 import { NextRequest, NextResponse } from "next/server";
 
+export const config = {
+    api: {
+        bodyParser: false, // تأكد من وجود هذا إذا لزم الأمر
+        externalResolver: true,
+        responseLimit: '20mb', // أدخل حجمًا مناسبًا هنا
+    },
+};
+
 export async function POST(req: NextRequest) {
     const rateLimitResponse = await rateLimiterMiddleware(req);
     if (rateLimitResponse) return rateLimitResponse;
@@ -101,10 +109,3 @@ export async function POST(req: NextRequest) {
   });
 }
 
-export const routeConfig = {
-    api: {
-        bodyParser: false, // تأكد من وجود هذا إذا لزم الأمر
-        externalResolver: true,
-        responseLimit: '20mb', // أدخل حجمًا مناسبًا هنا
-    },
-};
