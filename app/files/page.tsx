@@ -1,12 +1,15 @@
 "use client"
-import React, { useState } from 'react';
+import  {  useState } from 'react';
 import Header from '../landingPageComponents/Header';
+
 
 interface File {
   id: string;
   file_name: string;
   full_category_path: string;
 }
+const cache = new Map();
+const cache_search = new Map();
 
 const SearchPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,38 +18,102 @@ const SearchPage: React.FC = () => {
   const [erro, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentCatIndx,setCurrentCatIndx] = useState(-1);
-
+  const [emptyPage,setemptyPage] = useState(true);
+  const [noMoreFileserror,setNoMoreFileserror] = useState(false);
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   const handleSuggestionClick = (suggestion: string,indx :number) => {
+    setemptyPage(true);
+    setFilePages([[]]);
     setSearchTerm(suggestion);
     setCurrentCatIndx(indx);
     onSearch(suggestion);
   };
 
-  const onSearch = async (search_query:string) => {
-    if(searchTerm.trim()==""&&search_query.trim()=="")
+  const handelGoMore = async () => {
+    if(noMoreFileserror)
       return;
-    setFilePages([[]]);
-    setError(false);
+    if(loading)
+      return
+    setNoMoreFileserror(false);
+    setCurrentPage(pre=>pre+1);
     setLoading(true);
-    const req = { "page": 1, "search_query": search_query.trim() };
-    const req_body = JSON.stringify(req);
-    const res = await fetch("/api/fiels/search", { method: "POST", body: req_body });
-    const result = await res.json();
-    setLoading(false);
-    if (!result.data) {
-      setError(true)
+    const key = `search_${searchTerm}_${currentPage+1}`;
+    if(cache.has(key)){
+      console.log("c")
+      console.log(cache.get(key))
+      setFilePages([...filesPages,cache.get(key)]);
+      setLoading(false);
+      window.scroll(0, 0);
       return;
     }
-    if (result.data.length == 0)
-      setError(true)
-    else setError(false)
-    setFilePages([result.data]);
-    setSearchTerm("");
-  }
+    const req = { "page": currentPage+2, "search_query": searchTerm.trim() };
+    const req_body = JSON.stringify(req);
+
+      const res = await fetch("/api/fiels/search", { method: "POST", body: req_body });
+      const result = await res.json();
+      if(result.data.length==0){
+        setNoMoreFileserror(true);
+        setCurrentPage(pre=>pre-1);
+        cache.set(key,result.data);
+        setLoading(false);
+        window.scroll(0, 0);
+        return;
+      }
+      setFilePages([...filesPages,result.data]);
+      cache.set(key,result.data)
+      setLoading(false)
+
+  };
+  
+  const onSearch = async (search_query: string) => {
+    if(loading)
+      return
+    setemptyPage(true);
+    setNoMoreFileserror(false);
+    if (search_query.trim() === "") return;
+    setFilePages([[]]);
+    setCurrentPage(0);
+    setError(false);
+    setLoading(true);
+    const key = `search_${searchTerm}_${currentPage+1}`;
+    if(cache_search.has(key)){
+      setError(false);
+        setFilePages([cache_search.get(key)]);
+        setemptyPage(false);
+        setLoading(false);
+      return;
+    }
+    const req = { "page": 1, "search_query": search_query.trim() };
+    const req_body = JSON.stringify(req);
+    try {
+      const res = await fetch("/api/fiels/search", { method: "POST", body: req_body });
+      const result = await res.json();
+      setLoading(false);
+      if (!result.data || result.data.length === 0) {
+        setError(true);
+      } else {
+        setError(false);
+        setFilePages([result.data]);
+        cache_search.set(key,result.data)
+        setemptyPage(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+    }
+  };
+  
+  const handleBack = () => {
+    window.scroll(0, 0);
+    setNoMoreFileserror(false);
+    if(currentPage<=0)
+      return;
+    setCurrentPage(currentPage-1);
+  };
+
 
   const uniqueCategories = [
     "علمي",
@@ -55,6 +122,7 @@ const SearchPage: React.FC = () => {
     "تاسع"
   ];
 
+
   return (
     <>
       <Header />
@@ -62,9 +130,9 @@ const SearchPage: React.FC = () => {
         <div className="mb-4">
           <div className='flex justify-end'>
             <input
-              type="search"
-              className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:border-green-500 "
-              placeholder="ابحث عن الملفات..."
+              type="text"
+              className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:border-green-500  text-right"
+              placeholder=". . . ابحث عن ملفات"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -74,38 +142,30 @@ const SearchPage: React.FC = () => {
           </div>
         </div >
         <div className="grid justify-items-start">
-          <div className=' flex px-2 bg-slate-50 w-full justify-end mr-4  rounded-md shadow-sm py-2'>
-          {uniqueCategories.map((category, index) => (
-            <button
-              key={index}
-              className={ (index==currentCatIndx)? " text-green-500 bg-slate-100 p-2 rounded-md shadow-md":""+ "flex  text-red-500 hover:text-green-600 mx-2  bg-slate-100 p-2 rounded-md"}
-              onClick={() => handleSuggestionClick(category,index)}
-            >
-              {category}
-            </button>
-            
-          ))}
-          </div>
-          <br></br>
+          
           {
             loading && <FilesLoadingSkeleton />
           }
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  ">
+        <div className={(loading?"hidden":" ")+"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  "}>
           {
             erro && <p className=' flex justify-center text-red-600 '>لم يتم العثور على الملفات المطلوبة جرب استخدام كلمات مشابهة</p>
+            
+          }
+          {
+            noMoreFileserror && <p className=' flex justify-center text-red-600 '>لم يتبقى نتائج بحث</p>
           }
           
-          {filesPages[currentPage].map((file) => (
-            <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow">
-              <h2 className="text-lg font-bold"> {file.file_name}</h2>
-              <p className="text-sm text-blue-400 overflow-hidden text-ellipsis ">{file.full_category_path.trim().split(" ").join("/")}</p>
+          { (!loading)&&filesPages[currentPage]?.map((file) => (
+            <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow overflow-hidden">
+              <p className="text-lg font-bold text-wrap"> {file.file_name}</p>
+              <p className="text-sm text-blue-400 overflow-hidden truncate">{file.full_category_path.trim().split(" ").reverse().join("/")}</p>
             </div>
           ))}
         </div>
-        <div className=' flex flex-row-reverse justify-between'>
-        <p className={" hidden"+(filesPages.length==0)?"":"block"}>عرض المزيد</p>
-        <p className='p-3 hidden'>العودة</p>
+        <div className={(emptyPage?"hidden": "flex flex-row-reverse justify-between py-2 bg-slate-50 my-4 mx-2 rounded-md")}>
+        <p className={(emptyPage?"hidden":"p-2 px-4 text-blue-500 hover:text-blue-600 hover:cursor-pointer")} onClick={handelGoMore} >عرض المزيد</p>
+        <p className={(emptyPage?"hidden":"p-2 text-red-500 px-4 hover:text-red-600 hover:cursor-pointer")} onClick={handleBack}>العودة</p>
         </div>
       </div>
     </>

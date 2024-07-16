@@ -101,8 +101,14 @@ const Files = () => {
       setLoading(false);
       return;
     }
-    setPendingCount(fileInputRef.current.files.length);
-    await wait(500)
+    const fileCount = fileInputRef.current.files.length;
+    if(!fileCount)
+    {
+      alert("خطأ")
+      return;
+    }
+    setPendingCount(pre=>pre+fileCount);
+    await wait(200)
     setLoading(false);
     for(let i=0;i<fileInputRef.current.files.length;i++){
     let form_data = new FormData();
@@ -116,12 +122,14 @@ const Files = () => {
     /*if(error)
       console.log(error)
     console.log(data);*/
+    try{
     const error = await uploadFile(fileInputRef.current.files[i],full_category_path);
     if(error){
-      alert("حدث خطأ ما اثناء تحميل الملف ");
+      alert("حدث خطأ ما اثناء تحميل الملف ربما هذا الملف موجود مسبقا");
       setPendingCount(pre=>pre-1);
       return;
     }
+  }catch(er) {alert(er)}
      setUploadedCount(pre=>pre+1);
      setPendingCount(pre=>pre-1);
     }

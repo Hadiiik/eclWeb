@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     }
     const req_body: Body = await req.json();
     const page = req_body.page;
-    const LIMIT = 20;
+    const LIMIT = 10;
     const start = (page - 1) * LIMIT;
     const end = start + LIMIT - 1;
     const search_query = sanitizeInput(req_body.search_query);
