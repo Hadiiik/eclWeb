@@ -9,16 +9,27 @@ type Body = {
     page: number,
     search_query: string
 };
-const CACHE_DURATION = 10 * 60; //min 
+const CACHE_DURATION = 10 * 60; // min 
 
 // دالة لإنشاء مجموعة فريدة من الكلمات المشابهة لكلمات البحث
 function generateSimilarWords(search_query: string): Set<string> {
     const similarWords = new Set<string>();
-    const words = search_query.split(' '); // تقسيم البحث إلى كلمات فردية
+    let words = search_query.split(' '); // تقسيم البحث إلى كلمات فردية
+    words = words.filter(ele => ele !== " " && ele !== "");
 
     for (const word of words) {
         // إضافة الكلمة الأصلية
         similarWords.add(word);
+
+        // إضافة الكلمة مع "ال" التعريف إذا لم تكن موجودة
+        if (!word.startsWith("ال")) {
+            similarWords.add("ال" + word);
+        }
+
+        // إضافة الكلمة بدون "ال" التعريف إذا كانت موجودة
+        if (word.startsWith("ال")) {
+            similarWords.add(word.substring(2));
+        }
 
         // إضافة الكلمات المشابهة
         for (let i = 0; i < word.length; i++) {
@@ -27,6 +38,16 @@ function generateSimilarWords(search_query: string): Set<string> {
                 for (const similarChar of similarChars[char]) {
                     const similarWord = word.substring(0, i) + similarChar + word.substring(i + 1);
                     similarWords.add(similarWord);
+
+                    // إضافة الكلمات المشابهة مع "ال" التعريف إذا لم تكن موجودة
+                    if (!similarWord.startsWith("ال")) {
+                        similarWords.add("ال" + similarWord);
+                    }
+
+                    // إضافة الكلمات المشابهة بدون "ال" التعريف إذا كانت موجودة
+                    if (similarWord.startsWith("ال")) {
+                        similarWords.add(similarWord.substring(2));
+                    }
                 }
             }
         }
@@ -50,11 +71,11 @@ export async function POST(req: NextRequest) {
     }
     const req_body: Body = await req.json();
     const page = req_body.page;
-    const LIMIT = 6;
+    const LIMIT = 20;
     const start = (page - 1) * LIMIT;
     const end = start + LIMIT - 1;
     const search_query = sanitizeInput(req_body.search_query);
-    //cache 
+    // cache 
     const key = `search_${page}_${search_query}`;
 
     if (cache.has(key)) {
@@ -66,7 +87,6 @@ export async function POST(req: NextRequest) {
     const similarWords = generateSimilarWords(search_query);
     // إنشاء شروط التصفية لكل كلمة مشابهة
     let filters = Array.from(similarWords).map(word => `full_category_path.ilike.%${word}%`).join(',');
-    
     // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
@@ -79,6 +99,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ status: 402 });
     }
     // الانتظار لمدة 500 مللي ثانية
-    await wait(500);
+     await wait(1000);
     return NextResponse.json({ data });
 }

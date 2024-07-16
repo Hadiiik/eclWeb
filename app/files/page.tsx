@@ -21,14 +21,18 @@ const SearchPage: React.FC = () => {
   };
 
   const handleSuggestionClick = (suggestion: string,indx :number) => {
-    setCurrentCatIndx(indx);
     setSearchTerm(suggestion);
+    setCurrentCatIndx(indx);
     onSearch(suggestion);
   };
 
   const onSearch = async (search_query:string) => {
+    if(searchTerm.trim()==""&&search_query.trim()=="")
+      return;
+    setFilePages([[]]);
+    setError(false);
     setLoading(true);
-    const req = { "page": 1, "search_query": searchTerm.trim() };
+    const req = { "page": 1, "search_query": search_query.trim() };
     const req_body = JSON.stringify(req);
     const res = await fetch("/api/fiels/search", { method: "POST", body: req_body });
     const result = await res.json();
@@ -40,10 +44,8 @@ const SearchPage: React.FC = () => {
     if (result.data.length == 0)
       setError(true)
     else setError(false)
-    
-    console.log(result)
-    setFilePages(prev => [...prev, result.data]);
-    setCurrentPage(pre => pre + 1);
+    setFilePages([result.data]);
+    setSearchTerm("");
   }
 
   const uniqueCategories = [
@@ -66,7 +68,7 @@ const SearchPage: React.FC = () => {
               value={searchTerm}
               onChange={handleSearch}
             />
-            <p className='p-3 mx-2 bg-slate-300 flex self-center rounded-md hover:bg-slate-200 hover:cursor-pointer'
+            <p className='text-white p-3 mx-2 bg-green-500 flex self-center rounded-md hover:bg-green-600 hover:cursor-pointer'
               onClick={()=>onSearch(searchTerm)}
             >بحث</p>
           </div>
@@ -89,9 +91,9 @@ const SearchPage: React.FC = () => {
             loading && <FilesLoadingSkeleton />
           }
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  ">
           {
-            erro && <p className='flex justify-center text-red-600'>لم يتم العثور على الملفات المطلوبة جرب استخدام كلمات مشابهة</p>
+            erro && <p className=' flex justify-center text-red-600 '>لم يتم العثور على الملفات المطلوبة جرب استخدام كلمات مشابهة</p>
           }
           
           {filesPages[currentPage].map((file) => (
@@ -100,6 +102,10 @@ const SearchPage: React.FC = () => {
               <p className="text-sm text-blue-400 overflow-hidden text-ellipsis ">{file.full_category_path.trim().split(" ").join("/")}</p>
             </div>
           ))}
+        </div>
+        <div className=' flex flex-row-reverse justify-between'>
+        <p className={" hidden"+(filesPages.length==0)?"":"block"}>عرض المزيد</p>
+        <p className='p-3 hidden'>العودة</p>
         </div>
       </div>
     </>

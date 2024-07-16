@@ -1,6 +1,7 @@
 "use client"
 import { ChangeEvent, FormEvent,  useRef,  useState } from "react";
 import DashBoardHeader from "../dashboardCompenetnts/DashBoardHeader";
+import { uploadFile } from "@/helpers/uploadFile";
 const Files = () => {
   const [categoriesArry, setCategoriesArry] = useState<string[]>([""]);
   const [optionsMatrix, setOptionsMatrix] = useState<string[][]>([["علمي","ادبي"]]);
@@ -74,11 +75,14 @@ const Files = () => {
     e.preventDefault();
     //post categories
     const postCat = async (category_name:string,parent_category_name:string) =>{
+      const catName = category_name.split(" ").join("_");
+      console.log(catName)
+      const pCatName = parent_category_name.split(" ").join("_");
       const res = await fetch("/api/fiels/postCategories",{
         method:"POST", headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-      },body:JSON.stringify({"category_name":category_name,"parent_category_name":parent_category_name})
+      },body:JSON.stringify({"category_name":catName,"parent_category_name":pCatName})
       })
     }
     for(let i=1;i<categoriesArry.length;i++){
@@ -108,7 +112,16 @@ const Files = () => {
       full_category_path+= " "+fileInputRef.current.files[i].name.trim()
     form_data.append("full_category_path",full_category_path)
     //await uploadFileInChunks(fileInputRef.current.files[i],full_category_path);
-     const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
+    //const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
+    /*if(error)
+      console.log(error)
+    console.log(data);*/
+    const error = await uploadFile(fileInputRef.current.files[i],full_category_path);
+    if(error){
+      alert("حدث خطأ ما اثناء تحميل الملف ");
+      setPendingCount(pre=>pre-1);
+      return;
+    }
      setUploadedCount(pre=>pre+1);
      setPendingCount(pre=>pre-1);
     }
@@ -121,34 +134,6 @@ const Files = () => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
-
-
-const uploadFileInChunks = async (file: File,full_category_path:string) => {
-  const chunkSize = 4 * 1024 * 1024; // 5MB
-  const totalChunks = Math.ceil(file.size / chunkSize);
-  const fileId = generateUUID(); // توليد معرف فريد للملف
-
-  for (let i = 0; i < totalChunks; i++) {
-    const start = i * chunkSize;
-    const end = Math.min(start + chunkSize, file.size);
-    const chunk = file.slice(start, end);
-
-    const formData = new FormData();
-    formData.append('document', chunk);
-    formData.append('fileId', fileId); // إضافة معرف الملف الفريد
-    formData.append('partNumber', (i + 1).toString());
-    formData.append('totalParts', totalChunks.toString());
-    formData.append("name",file.name)
-    formData.append("full_category_path",full_category_path)
-
-    const res =  await fetch('/api/uploadLargeFile', {
-      method: 'POST',
-      body: formData,
-    });
-    console.log(res)
-  }
-};
 
 // دالة لتوليد معرف UUID
 function generateUUID() {
