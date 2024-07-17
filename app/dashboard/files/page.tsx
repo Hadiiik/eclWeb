@@ -1,5 +1,5 @@
 "use client"
-import { ChangeEvent, FormEvent,  useRef,  useState } from "react";
+import { ChangeEvent, FormEvent,  useEffect,  useRef,  useState } from "react";
 import DashBoardHeader from "../dashboardCompenetnts/DashBoardHeader";
 import { uploadFile } from "@/helpers/uploadFile";
 const Files = () => {
@@ -148,6 +148,23 @@ function generateUUID() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const confirmUnload = (e) => {
+        // عرض رسالة تأكيد عند محاولة المستخدم إعادة تحميل أو إغلاق الصفحة
+        e.preventDefault();
+        e.returnValue = ''; // Chrome requires returnValue to be set
+        return ''; // يجب أن يكون العودة بالسلسلة الفارغة لتجنب تظهر الرسائل المخصصة في بعض المتصفحات
+    };
+
+    // إضافة المستمع لـ beforeunload عندما يتم تحميل التطبيق
+    window.addEventListener('beforeunload', confirmUnload);
+
+    // إزالة المستمع عندما يتم تفكيك المكون أو إغلاق التطبيق
+    return () => {
+        window.removeEventListener('beforeunload', confirmUnload);
+    };
+}, []);
+
   return (
     <>
     <DashBoardHeader/>
