@@ -4,13 +4,7 @@ import { supabase } from '@/lib/supabase';
 import Head from 'next/head';
 
 // بيانات الملف
-const file = {
-  title: 'ملف العنوان الأول',
-  category: 'الفئة الأولى',
-  image: '/images/file1.jpg',
-  fileUrl: '/files/file1.pdf',
-  previewUrl: '/previews/file1-preview',
-};
+
 const getFileInfo = async (file_id:string)=>{
     const {data,error} = await supabase
     .from('files')
@@ -40,6 +34,7 @@ function arabicToUniqueEnglishValue(name:string) {
 export default async function  Files( {params }: { params: { id: string } }) {
    const info =  await getFileInfo(params.id);
    let fileName = info[0].file_name;
+   const fn = fileName
     fileName = arabicToUniqueEnglishValue(fileName)
    const full_category_path = info[0].full_category_path;
    const fileUrl = await getFileUrl(fileName);
@@ -51,7 +46,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
     <div className="bg-gray-100 min-h-screen">
       <Head>
         <title>صفحة تحميل الملف</title>
-        <meta name="description" content={`تحميل ملف ${file.title}`} />
+        <meta name="description" content={`تحميل ملف ${fn}`} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

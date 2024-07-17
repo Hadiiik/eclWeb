@@ -158,8 +158,8 @@ const SearchPage: React.FC = () => {
             noMoreFileserror && <p className=' flex justify-center text-red-600 '>لم يتبقى نتائج بحث</p>
           }
           
-          { (!loading)&&filesPages[currentPage]?.map((file) => (
-            <Link href={`files/${file.id}`}>
+          { (!loading)&&filesPages[currentPage]?.map((file,indx) => (
+            <Link href={`files/${file.id}`} key={indx}>
             <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow overflow-hidden">
               <p className=" text-gray-900   font-bold text-wrap"> {file.file_name}</p>
             </div>
