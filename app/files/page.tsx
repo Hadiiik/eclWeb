@@ -1,6 +1,7 @@
 "use client"
 import  {  useState } from 'react';
 import Header from '../landingPageComponents/Header';
+import Link from 'next/link';
 
 
 interface File {
@@ -72,9 +73,9 @@ const SearchPage: React.FC = () => {
   const onSearch = async (search_query: string) => {
     if(loading)
       return
-    setemptyPage(true);
     setNoMoreFileserror(false);
     if (search_query.trim() === "") return;
+    setemptyPage(true);
     setFilePages([[]]);
     setCurrentPage(0);
     setError(false);
@@ -158,13 +159,14 @@ const SearchPage: React.FC = () => {
           }
           
           { (!loading)&&filesPages[currentPage]?.map((file) => (
+            <Link href={`files/${file.id}`}>
             <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow overflow-hidden">
-              <p className="text-lg font-bold text-wrap"> {file.file_name}</p>
-              <p className="text-sm text-blue-400 overflow-hidden truncate">{file.full_category_path.trim().split(" ").reverse().join("/")}</p>
+              <p className=" text-gray-900   font-bold text-wrap"> {file.file_name}</p>
             </div>
+            </Link>
           ))}
         </div>
-        <div className={(emptyPage?"hidden": "flex flex-row-reverse justify-between py-2 bg-slate-50 my-4 mx-2 rounded-md")}>
+        <div className={(emptyPage?"hidden": "flex flex-row-reverse justify-between py-2 bg-slate-50 my-4 mx-2 rounded-md overflow-hidden")}>
         <p className={(emptyPage?"hidden":"p-2 px-4 text-blue-500 hover:text-blue-600 hover:cursor-pointer")} onClick={handelGoMore} >عرض المزيد</p>
         <p className={(emptyPage?"hidden":"p-2 text-red-500 px-4 hover:text-red-600 hover:cursor-pointer")} onClick={handleBack}>العودة</p>
         </div>

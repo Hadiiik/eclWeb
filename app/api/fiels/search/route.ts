@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     // تنفيذ البحث باستخدام شروط التصفية المدمجة
     const { data, error } = await supabase
         .from("files")
-        .select("file_name, id, full_category_path")
+        .select("file_name, id")
         .or(filters)
         .order("created_at", { ascending: false })
         .range(start, end);
