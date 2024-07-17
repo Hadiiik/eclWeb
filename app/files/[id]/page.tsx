@@ -1,5 +1,4 @@
 // pages/index.js
-"use client"
 import { supabase } from '@/lib/supabase';
 import Head from 'next/head';
 
@@ -40,7 +39,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
    const fileUrl = await getFileUrl(fileName);
    const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
-}`
+`
 
    //const downloadUrl 
   return (
@@ -63,7 +62,6 @@ export default async function  Files( {params }: { params: { id: string } }) {
             <br></br>
             <p className='pb-2'>لسا ما ضفنا وصف امية الكويسة بس منضيف بعدين</p>
             <hr></hr>
-            <iframe src={fileUrl?.signedUrl} height={'600px'} width={"100%"} title={fn}></iframe>
             <div className="mt-4 flex flex-col">
             <a
                 href={fileUrl?.signedUrl}
@@ -82,7 +80,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
 
               <a
                 href={`/files/${params.id}/${fileName}`}
-                className="bg-blue-500 text-white  rounded-md hover:bg-blue-600 transition-colors duration-300 text-center p-4 m-2"
+                className="bg-gray-400 text-white  rounded-md hover:bg-gray-600 transition-colors duration-300 text-center p-4 m-2"
                 
               >
                 معاينة الملف
