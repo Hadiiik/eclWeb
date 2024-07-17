@@ -1,6 +1,6 @@
 // pages/index.js
 import { supabase } from '@/lib/supabase';
-import Head from 'next/head';
+
 
 // بيانات الملف
 
@@ -18,7 +18,7 @@ const getFileUrl = async (filePath:string) =>{
 const { data } = await supabase
 .storage
 .from('files')
-.createSignedUrl(filePath, 3600)
+.createSignedUrl(filePath, 3600,{download:true})
 return data
 
 }
@@ -44,11 +44,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
    //const downloadUrl 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <Head>
-        <title>صفحة تحميل الملف</title>
-        <meta name="description" content={`تحميل ملف ${fn}`} />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+     
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">صفحة تحميل الملف</h1>
@@ -64,9 +60,10 @@ export default async function  Files( {params }: { params: { id: string } }) {
             <hr></hr>
             <div className="mt-4 flex flex-col">
             <a
+                download={encodeURIComponent(fn)}
                 href={fileUrl?.signedUrl}
                 className="bg-green-500 text-white  rounded-md hover:bg-green-600 transition-colors duration-300 text-center p-4 m-2"
-                download
+                
               >
                 تحميل الملف
               </a>

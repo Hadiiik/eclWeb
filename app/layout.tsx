@@ -9,6 +9,9 @@ const ballo = Baloo_Bhaijaan_2({subsets:["arabic"]})
 export const metadata: Metadata = {
   title: "ECL",
   description: "ecl",
+  icons: {
+    icon: '/eclLogo.png',
+  },
 };
 
 export default function RootLayout({
@@ -18,6 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" className=" scroll-smooth focus:scroll-auto ">
+      
       <body className={ballo.className}>
         <div className="flex flex-col min-h-screen">
           <main className=" flex-grow">

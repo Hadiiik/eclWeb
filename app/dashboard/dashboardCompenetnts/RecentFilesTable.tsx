@@ -82,7 +82,7 @@ const MessagesTable = () => {
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{file.file_name}</td>
               <td className="px-4 py-2 max-w-2 overflow-ellipsis overflow-hidden">{formatDate(file.created_at)}</td>
               <td className="px-4 py-2">
-                <Link href={`/dashboard/messages/${file.id}`} className="text-green-500 hover:text-green-700">
+                <Link href={`/files/${file.id}`} className="text-green-500 hover:text-green-700">
                   عرض الملف
                 </Link>
               </td>
