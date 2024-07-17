@@ -1,5 +1,5 @@
 // pages/index.js
-
+"use client"
 import { supabase } from '@/lib/supabase';
 import Head from 'next/head';
 
@@ -38,9 +38,10 @@ export default async function  Files( {params }: { params: { id: string } }) {
     fileName = arabicToUniqueEnglishValue(fileName)
    const full_category_path = info[0].full_category_path;
    const fileUrl = await getFileUrl(fileName);
-   const shareText = `حمل ملف ${fileName} عبر موقع فريق ECL 
+   const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
 }`
+
    //const downloadUrl 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -55,17 +56,15 @@ export default async function  Files( {params }: { params: { id: string } }) {
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden text-right">
           <div className="p-4">
-            <h2 className="text-xl font-semibold">{fileName}</h2>
+            <h2 className="text-xl font-semibold">{fn}</h2>
             <p className="text-green-400 text-sm">{full_category_path}</p>
             <br></br>
             <h2 className=' text-right '>: وصف الملف</h2>
             <br></br>
             <p className='pb-2'>لسا ما ضفنا وصف امية الكويسة بس منضيف بعدين</p>
             <hr></hr>
-
+            <iframe src={fileUrl?.signedUrl} height={'600px'} width={"100%"} title={fn}></iframe>
             <div className="mt-4 flex flex-col">
-            <iframe src={fileUrl?.signedUrl} width="100%" height="600px" title="File Preview"></iframe>
-
             <a
                 href={fileUrl?.signedUrl}
                 className="bg-green-500 text-white  rounded-md hover:bg-green-600 transition-colors duration-300 text-center p-4 m-2"
@@ -79,6 +78,14 @@ export default async function  Files( {params }: { params: { id: string } }) {
                 
               >
                 مشاركة الملف
+              </a>
+
+              <a
+                href={`/files/${params.id}/${fileName}`}
+                className="bg-blue-500 text-white  rounded-md hover:bg-blue-600 transition-colors duration-300 text-center p-4 m-2"
+                
+              >
+                معاينة الملف
               </a>
               
               
