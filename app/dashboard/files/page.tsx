@@ -93,6 +93,7 @@ const Files = () => {
     for(let i=0;i<categoriesArry.length;i++)
       full_category_path+= " " + categoriesArry[i].trim();
     setCategoriesArry([""]);
+    inputRef.current!.value = "";
     
     //upload file 
     if(!fileInputRef.current || !fileInputRef.current.files)
@@ -123,18 +124,12 @@ const Files = () => {
       console.log(error)
     console.log(data);*/
     try{
-    const error = await uploadFile(fileInputRef.current.files[i],full_category_path);
-    if(error){
-      alert("حدث خطأ ما اثناء تحميل الملف ربما هذا الملف موجود مسبقا");
-      setPendingCount(pre=>pre-1);
-      return;
-    }
+      await uploadFile(fileInputRef.current.files[i],full_category_path);
   }catch(er) {alert(er)}
      setUploadedCount(pre=>pre+1);
      setPendingCount(pre=>pre-1);
     }
   }
-    //
     
 
   }
@@ -152,6 +147,7 @@ function generateUUID() {
 }
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <>
     <DashBoardHeader/>
@@ -174,6 +170,7 @@ function generateUUID() {
                 type="text" 
                 placeholder="اختر تصنيف" 
                 list={`list-${indx}`} 
+                ref={inputRef}
                 className="p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
               />
               <datalist id={`list-${indx}`}>
