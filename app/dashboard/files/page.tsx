@@ -149,7 +149,7 @@ function generateUUID() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const confirmUnload = (e) => {
+    const confirmUnload = (e: { preventDefault: () => void; returnValue: string; }) => {
         // عرض رسالة تأكيد عند محاولة المستخدم إعادة تحميل أو إغلاق الصفحة
         e.preventDefault();
         e.returnValue = ''; // Chrome requires returnValue to be set

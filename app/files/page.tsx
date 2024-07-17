@@ -63,7 +63,8 @@ const SearchPage: React.FC = () => {
         return;
       }
       setFilePages([...filesPages,result.data]);
-      cache.set(key,result.data)
+      window.scroll(0, 0);
+      cache.set(key,result.data);
       setLoading(false)
 
   };
