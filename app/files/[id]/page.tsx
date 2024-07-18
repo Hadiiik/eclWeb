@@ -1,7 +1,7 @@
 // pages/index.js
 import { supabase } from '@/lib/supabase';
 
-export const revalidate = 1200;
+export const dynamic = 'force-dynamic'
 // بيانات الملف
 
 const getFileInfo = async (file_id:string)=>{
@@ -66,7 +66,6 @@ export default async function  Files( {params }: { params: { id: string } }) {
               >
                 تحميل الملف
               </a>
-              <p className=' text-sm text-red-600 text-right pb-2 px-2'>في حال تعذر تحميل الملف يرجى تحديث الصفحة</p>
               <a
                 href={`whatsapp://send?text=${shareText}`} data-action="share/whatsapp/share"
                 className="bg-blue-500 text-white  rounded-md hover:bg-blue-600 transition-colors duration-300 text-center p-4 m-2"
