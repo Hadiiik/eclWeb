@@ -13,12 +13,12 @@ const getFileInfo = async (file_id:string)=>{
         throw new Error();
     return data;
 }
-const getFileUrl = async (filePath:string) =>{
+const getFileUrl = async (filePath:string,originalFileName:string) =>{
     
 const { data } = await supabase
 .storage
 .from('files')
-.createSignedUrl(filePath, 3600,{download:true})
+.createSignedUrl(filePath, 3600,{download:originalFileName})
 return data
 
 }
@@ -36,7 +36,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
    const fn = fileName
     fileName = arabicToUniqueEnglishValue(fileName)
    const full_category_path = info[0].full_category_path;
-   const fileUrl = await getFileUrl(fileName);
+   const fileUrl = await getFileUrl(fileName,fn);
    const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
 `
