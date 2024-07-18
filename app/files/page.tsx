@@ -1,5 +1,5 @@
 "use client"
-import  {  useState } from 'react';
+import  {  useEffect, useState } from 'react';
 import Header from '../landingPageComponents/Header';
 import Link from 'next/link';
 
@@ -18,20 +18,37 @@ const SearchPage: React.FC = () => {
   const [filesPages, setFilePages] = useState<File[][]>([[]]);
   const [erro, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentCatIndx,setCurrentCatIndx] = useState(-1);
   const [emptyPage,setemptyPage] = useState(true);
   const [noMoreFileserror,setNoMoreFileserror] = useState(false);
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSuggestionClick = (suggestion: string,indx :number) => {
-    setemptyPage(true);
-    setFilePages([[]]);
-    setSearchTerm(suggestion);
-    setCurrentCatIndx(indx);
-    onSearch(suggestion);
-  };
+  useEffect(()=>{
+    async function getAllFiles() {
+      setLoading(true);
+      setSearchTerm("ALL_FILES");
+      const req = { "page": 1, "search_query": "ALL_FILES" };
+    const req_body = JSON.stringify(req);
+    try {
+      const res = await fetch("/api/fiels/search", { method: "POST", body: req_body });
+      const result = await res.json();
+      setLoading(false);
+      if (!result.data || result.data.length === 0) {
+        setError(true);
+      } else {
+        setError(false);
+        setFilePages([result.data]);
+        setemptyPage(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+    }
+
+    }
+    getAllFiles();
+  },[])
 
   const handelGoMore = async () => {
     if(noMoreFileserror)
@@ -116,15 +133,6 @@ const SearchPage: React.FC = () => {
     setCurrentPage(currentPage-1);
   };
 
-
-  const uniqueCategories = [
-    "علمي",
-    "أدبي",
-    "بكالوريا",
-    "تاسع"
-  ];
-
-
   return (
     <>
       <Header />
@@ -135,7 +143,6 @@ const SearchPage: React.FC = () => {
               type="text"
               className="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:border-green-500  text-right"
               placeholder=". . . ابحث عن ملفات"
-              value={searchTerm}
               onChange={handleSearch}
             />
             <p className='text-white p-3 mx-2 bg-green-500 flex self-center rounded-md hover:bg-green-600 hover:cursor-pointer'
@@ -160,7 +167,7 @@ const SearchPage: React.FC = () => {
           
           { (!loading)&&filesPages[currentPage]?.map((file,indx) => (
             <Link href={`files/${file.id}`} key={indx}>
-            <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow overflow-hidden">
+            <div key={file.id} className="border rounded-md p-4 hover:shadow-lg transition-shadow overflow-hidden bg-neutral-100">
               <p className=" text-gray-900   font-bold text-wrap"> {file.file_name}</p>
             </div>
             </Link>
@@ -187,7 +194,7 @@ const FilesLoadingSkeleton = () => {
         {Array.from({ length: 6 }).map((_, index) => (
           <div key={index} className="bg-white p-6 rounded-lg shadow-md space-y-4 w-11/12 md:w-9/12 lg:w-8/12 mx-auto">
             <div className="animate-pulse flex space-x-4 items-center">
-              <div className="rounded-full bg-gray-200 h-12 w-12"></div>
+              <div className=" bg-gray-200 h-6 w-12"></div>
               <div className="flex-1 space-y-4 py-1">
                 <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
                 <div className="space-y-2">

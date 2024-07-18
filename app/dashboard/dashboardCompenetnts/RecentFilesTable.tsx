@@ -62,7 +62,7 @@ const MessagesTable = () => {
 
   return (
     <div className="overflow-x-auto rounded-md pt-4" id="messages">
-      <Link href={"/dashboard/files"} className=' flex justify-center bg-green-600 py-4 mb-3 rounded-md mx-20 text-sm text-white hover:bg-green-700'> تحميل ملفات</Link>
+      <Link href={"/dashboard/files"}  target='_blank' className=' flex justify-center bg-green-600 py-4 mb-3 rounded-md mx-20 text-sm text-white hover:bg-green-700'> تحميل ملفات</Link>
       <hr></hr>
       <hr></hr>
       <h1 className='flex justify-center font-bold p-4 text-red-600'>
