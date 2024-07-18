@@ -1,7 +1,7 @@
 // pages/index.js
 import { supabase } from '@/lib/supabase';
 
-export const revaidate = 1200;
+export const revalidate = 1200;
 // بيانات الملف
 
 const getFileInfo = async (file_id:string)=>{
