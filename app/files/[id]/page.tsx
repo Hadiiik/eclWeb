@@ -13,12 +13,12 @@ const getFileInfo = async (file_id:string)=>{
         throw new Error();
     return data;
 }
-const getFileUrl = async (filePath:string) =>{
+const getFileUrl = async (filePath:string,originalFileName:string) =>{
     
 const { data } = await supabase
 .storage
 .from('files')
-.createSignedUrl(filePath, 3600,{download:true})
+.createSignedUrl(filePath, 3600,{download:originalFileName})
 return data
 
 }
@@ -36,7 +36,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
    const fn = fileName
     fileName = arabicToUniqueEnglishValue(fileName)
    const full_category_path = info[0].full_category_path;
-   const fileUrl = await getFileUrl(fileName);
+   const fileUrl = await getFileUrl(fileName,fn);
    const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
 `
@@ -48,7 +48,6 @@ export default async function  Files( {params }: { params: { id: string } }) {
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">صفحة تحميل الملف</h1>
-
         <div className="bg-white rounded-lg shadow-md overflow-hidden text-right">
           <div className="p-4">
             <h2 className="text-xl font-semibold">{fn}</h2>
@@ -67,6 +66,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
               >
                 تحميل الملف
               </a>
+              <p className=' text-sm text-red-600 text-right pb-2 px-2'>في حال تعذر تحميل الملف يرجى تحديث الصفحة</p>
               <a
                 href={`whatsapp://send?text=${shareText}`} data-action="share/whatsapp/share"
                 className="bg-blue-500 text-white  rounded-md hover:bg-blue-600 transition-colors duration-300 text-center p-4 m-2"

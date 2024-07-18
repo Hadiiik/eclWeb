@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "ECL",
   description: "ecl",
   icons: {
-    icon: '/eclLogo.png',
+    icon: '/eclLog.png',
   },
 };
 
