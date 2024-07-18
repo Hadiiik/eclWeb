@@ -48,7 +48,6 @@ export default async function  Files( {params }: { params: { id: string } }) {
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">صفحة تحميل الملف</h1>
-
         <div className="bg-white rounded-lg shadow-md overflow-hidden text-right">
           <div className="p-4">
             <h2 className="text-xl font-semibold">{fn}</h2>
@@ -67,6 +66,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
               >
                 تحميل الملف
               </a>
+              <p className=' text-sm text-red-600 text-right pb-2 px-2'>في حال تعذر تحميل الملف يرجى تحديث الصفحة</p>
               <a
                 href={`whatsapp://send?text=${shareText}`} data-action="share/whatsapp/share"
                 className="bg-blue-500 text-white  rounded-md hover:bg-blue-600 transition-colors duration-300 text-center p-4 m-2"
