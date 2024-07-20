@@ -23,8 +23,8 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
         <button id="next-page">الصفحة التالية</button>
         </div>
       </div>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-      <script
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" async></script>
+      <script async
         dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', function() {
