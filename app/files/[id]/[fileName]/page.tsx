@@ -3,15 +3,15 @@ import { supabase } from '@/lib/supabase';
 
 const PDFPage = async ({params }: { params: { fileName: string } }) => {
   const getFileUrl = async (filePath:string) =>{
-    
     const { data } = await supabase
     .storage
     .from('files')
-    .createSignedUrl(filePath, 2400,{download:true})
-    return data?.signedUrl
-    
-    }
-    const fileUrl = await getFileUrl(params.fileName);
+    .getPublicUrl(filePath);
+    return data?.publicUrl;
+  }
+
+  const fileUrl = await getFileUrl(params.fileName);
+
   return (
     <div>
       <h1>معاينة الملف</h1>
@@ -19,11 +19,11 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
       <canvas id="pdf-canvas" style={{ display: 'none' }}></canvas>
       <div className="buttons" style={{ display: 'none' }}>
         <div id='buttons-contaier'>
-        <button id="prev-page">الصفحة السابقة</button>
-        <button id="next-page">الصفحة التالية</button>
+          <button id="prev-page">الصفحة السابقة</button>
+          <button id="next-page">الصفحة التالية</button>
         </div>
       </div>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" async></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" async defer></script>
       <script async
         dangerouslySetInnerHTML={{
           __html: `
@@ -39,8 +39,14 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
               // تعيين مسار Web Worker
               pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-              // تحميل ملف PDF
-              pdfjsLib.getDocument(url).promise
+              // تحميل ملف PDF جزئيًا
+              const loadingTask = pdfjsLib.getDocument({ 
+                url: url,
+                disableAutoFetch: true, disableStream: true,
+                rangeChunkSize:64
+              });
+
+              loadingTask.promise
                 .then(pdf => {
                   pdfDoc = pdf;
                   renderPage(pageNum); // عرض الصفحة الأولى عند التحميل
@@ -86,7 +92,7 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
           `
         }}
       />
-      <style >{`
+      <style>{`
         div {
           display: flex;
           flex-direction: column;
@@ -107,8 +113,6 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
           margin-bottom: 20px;
         }
         .buttons {
-          
-          
           justify-content: space-between;
           width: 100%;
           max-width: 300px;
@@ -118,11 +122,10 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
           font-size: 16px;
           cursor: pointer;
         }
-          #buttons-contaier{
-            display: flex;
-            flex-direction: row;
-
-          }
+        #buttons-contaier {
+          display: flex;
+          flex-direction: row;
+        }
       `}</style>
     </div>
   );

@@ -63,6 +63,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
    const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
 `
+  
   return (
     <div className="bg-gray-100 min-h-screen">
      
