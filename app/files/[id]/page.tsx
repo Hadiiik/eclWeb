@@ -96,7 +96,7 @@ export default async function  Files( {params }: { params: { id: string } }) {
               </a>
 
               <a
-                href={filePreviewUrl?.signedUrl}
+                href={`/files/${params.id}/${fileName}`}
                 className="bg-gray-400 text-white  rounded-md hover:bg-gray-600 transition-colors duration-300 text-center p-4 m-2"
                 target='_blank'
               >
