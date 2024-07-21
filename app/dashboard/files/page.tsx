@@ -184,17 +184,18 @@ const Files = () => {
                 placeholder="اختر تصنيف" 
                 list={`list-${indx}`} 
                 ref={inputRef}
-                className="text-right p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
+                className="p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
               />
               <datalist id={`list-${indx}`}>
                 {
                   optionsMatrix[indx]?.map((op,i)=><option value={op} key={`op-${i}`}></option>)
                 }
               </datalist>
-              <textarea placeholder="  . . . وصف الملف "  className="mt-4 border border-gray-300 rounded focus:outline-none focus:border-green-500 pt-3 text-right px-2" onChange={(e)=>{setDescription(e)}} value={Description}/>
+              
             </div>
           ))
         }
+        <textarea placeholder="  . . . وصف الملف "  className="w-full mt-4 border border-gray-300 rounded focus:outline-none focus:border-green-500 pt-3" onChange={(e)=>{setDescription(e)}} value={Description}/>
         <button 
           type="submit" 
           className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"

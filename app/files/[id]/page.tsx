@@ -35,7 +35,7 @@ return data
 }
 
 const getThumbnail = async (filePath:string) =>{
-    
+    //fix time 
   const { data } = await supabase
 .storage
 .from('files')
