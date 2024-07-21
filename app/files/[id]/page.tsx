@@ -1,5 +1,6 @@
 // pages/index.js
 import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 import NodeCache from 'node-cache';
 
 export const dynamic = 'force-dynamic'
@@ -32,34 +33,50 @@ const { data } = await supabase
 return data
 
 }
-const getPreviewUrl = async (filePath:string,originalFileName:string) =>{
+
+const getThumbnail = async (filePath:string) =>{
     
   const { data } = await supabase
-  .storage
-  .from('files')
-  .createSignedUrl(filePath, 240,{download:false,transform:{quality:20}})
-  return data
-  
-  }
-function arabicToUniqueEnglishValue(name:string) {
-    const hash = name.split('').reduce((acc, char) => {
-        const charCode = char.charCodeAt(0);
-        return acc + charCode;
-    }, '');
-    return hash.toString();
+.storage
+.from('files')
+.createSignedUrl("thumbnails"+"/"+filePath+".png", 2400,{transform:{
+  quality:40
+}})
+return data?.signedUrl
+
 }
+
+  const simpleHash = (input: string): string => {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        hash = (hash << 5) - hash + input.charCodeAt(i);
+    }
+    // تحويل القيمة إلى قاعدة 36 (رقم و حروف)
+    return hash.toString(36);
+};
+
+const arabicToUniqueEnglishValue = (name: string) => {
+    return simpleHash(name);
+};
 
 export default async function  Files( {params }: { params: { id: string } }) {
   try{
    const info=  await getFileInfo(params.id);
    if(!info)
     throw new Error()
-   let fileName = info[0].file_name;
-   const fn = fileName
+   let fileName:string = info[0].file_name;
+   const fn = fileName.replace('.pdf','')
     fileName = arabicToUniqueEnglishValue(fileName);
-   const full_category_path = info[0].full_category_path;
+   const full_category_path:string = info[0].full_category_path;
+   let [categoryPtah,Description]:string[] = full_category_path.split(",");
+   categoryPtah = categoryPtah.replace(fn,"");
    const fileUrl = await getFileUrl(fileName,fn);
-   const filePreviewUrl = await getPreviewUrl(fileName,fn);
+   let isThumbnail = false;
+   const thumbnail = await getThumbnail(fileName);
+   console.log(thumbnail)
+   if(thumbnail&& await thumbnail!="")
+    isThumbnail = true;
+  
    const shareText = `حمل ملف ${fn} عبر موقع فريق ECL 
    ecl-web.vercel.app/files/${params.id}
 `
@@ -73,12 +90,17 @@ export default async function  Files( {params }: { params: { id: string } }) {
         <div className="bg-white rounded-lg shadow-md overflow-hidden text-right">
           <div className="p-4">
             <h2 className="text-xl font-semibold">{fn}</h2>
-            <p className="text-green-400 text-sm">{full_category_path}</p>
+            <p className="text-green-400 text-sm">{categoryPtah}</p>
             <br></br>
             <h2 className=' text-right '>: وصف الملف</h2>
             <br></br>
-            <p className='pb-2'>لسا ما ضفنا وصف امية الكويسة بس منضيف بعدين</p>
+            <p className='pb-2'>{Description}</p>
             <hr></hr>
+            { isThumbnail &&
+            <div className=' flex justify-center mb-4'>
+            <img src={thumbnail||""} alt={""}  style={{maxWidth:'100%',height:'auto'}} />
+            </div>
+            }
             <div className="mt-4 flex flex-col">
             <a
                 download={encodeURIComponent(fn)}

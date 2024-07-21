@@ -8,7 +8,10 @@ const Files = () => {
   const [uploadCount,setUploadedCount] = useState(0);
   const [pendingCount,setPendingCount] = useState(0);
   const [loading,setLoading] = useState(false);
-  
+  const [Description,set_Description] = useState("");
+  const setDescription = (e:ChangeEvent<HTMLTextAreaElement>)=>{
+    set_Description(e.currentTarget.value);
+  }
   const revalidateOptionsMatrix = async (startIndex: number) => {
     for (let i = startIndex + 1; i < categoriesArry.length; i++) {
       const option = await getOPtions(categoriesArry[i - 1]);
@@ -94,6 +97,7 @@ const Files = () => {
       full_category_path+= " " + categoriesArry[i].trim();
     setCategoriesArry([""]);
     inputRef.current!.value = "";
+    set_Description("");
     
     //upload file 
     if(!fileInputRef.current || !fileInputRef.current.files)
@@ -116,7 +120,8 @@ const Files = () => {
     if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[i]){
     form_data.append("document", fileInputRef.current.files[i])
     if(fileInputRef&&fileInputRef.current&&fileInputRef.current.files)
-      full_category_path+= " "+fileInputRef.current.files[i].name.trim()
+      full_category_path+= " "+fileInputRef.current.files[i].name.trim();
+    full_category_path += " , "+ Description.trim();
     form_data.append("full_category_path",full_category_path)
     //await uploadFileInChunks(fileInputRef.current.files[i],full_category_path);
     //const res = await fetch("/api/fiels/upload",{method:"POST",body:form_data});
@@ -135,15 +140,6 @@ const Files = () => {
   }
   function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-// دالة لتوليد معرف UUID
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
 }
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -188,13 +184,14 @@ function generateUUID() {
                 placeholder="اختر تصنيف" 
                 list={`list-${indx}`} 
                 ref={inputRef}
-                className="p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
+                className="text-right p-2 border border-gray-300 rounded focus:outline-none focus:border-green-500"
               />
               <datalist id={`list-${indx}`}>
                 {
                   optionsMatrix[indx]?.map((op,i)=><option value={op} key={`op-${i}`}></option>)
                 }
               </datalist>
+              <textarea placeholder="  . . . وصف الملف "  className="mt-4 border border-gray-300 rounded focus:outline-none focus:border-green-500 pt-3 text-right px-2" onChange={(e)=>{setDescription(e)}} value={Description}/>
             </div>
           ))
         }

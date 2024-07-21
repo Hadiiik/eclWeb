@@ -1,7 +1,7 @@
 // pages/pdf/[id].js
 import { supabase } from '@/lib/supabase';
 
-const PDFPage = async ({params }: { params: { fileName: string } }) => {
+const PDFPage = async ({ params }: { params: { fileName: string } }) => {
   const getFileUrl = async (filePath: string) => {
     const { data } = await supabase
       .storage
@@ -15,7 +15,7 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
   return (
     <div>
       <h1>معاينة الملف</h1>
-      <div id="loading-message">جاري معاينة الملف ... يرجى الانتظار</div>
+      <div id="loading-message">جاري تحميل الصفحة ... يرجى الانتظار</div>
       <canvas id="pdf-canvas" style={{ display: 'none' }}></canvas>
       <div className="buttons" style={{ display: 'none' }}>
         <div id="buttons-contaier">
@@ -58,6 +58,7 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
                     .catch(error => console.error('Error loading PDF:', error));
 
                   function renderPage(num) {
+                    loadingMessage.style.display = 'block'; // عرض حالة التحميل
                     pdfDoc.getPage(num).then(page => {
                       const scale = 1.5;
                       const viewport = page.getViewport({ scale });
@@ -72,7 +73,7 @@ const PDFPage = async ({params }: { params: { fileName: string } }) => {
                       page.render(renderContext).promise
                         .then(() => {
                           console.log('Page rendered');
-                          loadingMessage.style.display = 'none';
+                          loadingMessage.style.display = 'none'; // إخفاء حالة التحميل
                           canvas.style.display = 'block';
                           buttons.style.display = 'flex';
                         })
