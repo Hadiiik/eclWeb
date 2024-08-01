@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const middleware = (req:NextRequest)=>{
-    const s_token = req.cookies.get('sToken')
-    if(req.nextUrl.pathname == '/'){
-        if(s_token&&s_token.value==process.env.S_TOKEN)
-            return NextResponse.rewrite(new URL('/dashboard', req.url)); 
-
-        return NextResponse.next();
-    }
-        
-    const cookie = req.cookies.get('user-data')
-    if(!cookie)
-        return NextResponse.rewrite(new URL('/sign-up', req.url));
-    if(req.nextUrl.pathname.startsWith("/dashboard")){
-        
-        if(!s_token)
-            return NextResponse.rewrite(new URL('/sign-up', req.url));
-        
-
-        if(s_token.value!=process.env.S_TOKEN)
-            return NextResponse.rewrite(new URL('/sign-up', req.url)); 
-        else return NextResponse.next();
-    }
+    
 
     return NextResponse.next();
 }

@@ -1,7 +1,7 @@
 "use client"
 import  {  useEffect, useState } from 'react';
-import Header from '../landingPageComponents/Header';
 import Link from 'next/link';
+import AddPanner from './components/AddPanner';
 
 
 interface File {
@@ -135,7 +135,6 @@ const SearchPage: React.FC = () => {
 
   return (
     <>
-      <Header />
       <div className="p-4 max-w-4xl mx-auto">
         <div className="mb-4">
           <div className='flex justify-end'>
