@@ -1,0 +1,2 @@
+#file name option when uploading the file 
+#try catch in all fetchs and remove loading state when error
