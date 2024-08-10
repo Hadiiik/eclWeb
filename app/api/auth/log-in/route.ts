@@ -30,6 +30,7 @@ export async function POST(req:NextRequest){
     const token = btoa(email+passwordHash);
     const response = NextResponse.json({ status: 200, message: "ok" });
     response.cookies.set("sToken", token);
+    response.cookies.set("user-data", token);
     await wait(3000)
     return response;
 

@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     await wait(3000);
     const response = NextResponse.json({ status: 200, message: "ok" });
     response.cookies.set("sToken", token);
+    response.cookies.set("user-data",token);
     return response;
 }
 
